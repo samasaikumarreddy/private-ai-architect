@@ -1,0 +1,17 @@
+# Example RAG policy. Defaults should favor grounded answers.
+retrieval:
+  chunk_size: 800
+  chunk_overlap: 120
+  top_k: 6
+  hybrid_search: false
+  reranker_enabled: false
+  citations_required: true
+  low_confidence_behavior: refuse
+  prompt_injection_detection: warn_and_filter
+
+answering:
+  source_grounded_mode: true
+  include_citations: true
+  allow_uncited_claims: false
+  unknown_answer: "I do not know based on the approved sources."
+

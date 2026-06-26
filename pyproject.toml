@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "private-ai-infra-blueprint"
+version = "0.1.0"
+description = "Open-source blueprint and CLI for planning private AI infrastructure with dry-run safety."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Private AI Infrastructure Blueprint contributors" }
+]
+keywords = [
+  "private-ai",
+  "rag",
+  "local-ai",
+  "llmops",
+  "ai-infrastructure",
+  "dgx",
+  "qdrant",
+  "ollama"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Security",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: System :: Systems Administration"
+]
+
+[project.urls]
+Homepage = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint"
+Documentation = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint/tree/main/docs"
+Issues = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint/issues"
+
+[project.scripts]
+private-ai = "private_ai_infra.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

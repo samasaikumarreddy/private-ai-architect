@@ -1,0 +1,123 @@
+# CLI Reference
+
+The CLI is the first working implementation milestone. It currently supports dry-run planning, validation, and local readiness inspection.
+
+## Install For Local Development
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e .
+```
+
+On Linux or macOS, activate with:
+
+```bash
+source .venv/bin/activate
+```
+
+## Commands
+
+```bash
+private-ai --help
+private-ai --version
+private-ai init --dry-run
+private-ai validate
+private-ai doctor
+```
+
+Planned but not implemented:
+
+```bash
+private-ai apply
+private-ai ingest
+private-ai chat
+private-ai audit
+```
+
+Those commands return a non-zero exit code in v0.1 because production-impacting behavior should not exist until validation and runtime code are ready.
+
+## Generate A Dry-Run Plan
+
+```bash
+private-ai init --dry-run --mode local-developer --project-name private-ai-demo --output-dir generated/dry-run --force
+```
+
+Generated files:
+
+```text
+generated/dry-run/
+  architecture-plan.md
+  stakeholder-checklist.md
+  network-requirements.md
+  security-review.md
+  proposed-docker-compose.yml
+  proposed-rbac.yaml
+  proposed-env.example
+  data-source-plan.md
+  model-plan.md
+  validation-report.md
+```
+
+Dry-run mode does not:
+
+- Start containers
+- Modify firewall rules
+- Create users
+- Apply VPN configuration
+- Ingest real company data
+- Download models
+- Expose ports
+
+## Validate A Dry-Run Plan
+
+```bash
+private-ai validate generated/dry-run
+```
+
+Validation checks include:
+
+- Required dry-run files exist.
+- API and UI bind to localhost by default.
+- Audit logging is required.
+- Admin role requires explicit assignment.
+- Secret and credential denied patterns are documented.
+- Network requirements block direct model runtime exposure.
+- Security review includes model runtime exposure controls.
+
+## Doctor
+
+```bash
+private-ai doctor
+```
+
+The doctor command reports local readiness signals:
+
+- Python version
+- OS and CPU architecture
+- Git availability
+- Docker availability
+- Ollama availability
+- NVIDIA GPU tooling availability
+
+Missing Docker, Ollama, or NVIDIA tooling is reported as a warning, not an immediate failure. CPU-only local planning is still valid.
+
+## Deployment Modes
+
+Supported mode names and aliases:
+
+| Canonical mode | Useful aliases |
+| --- | --- |
+| `local-developer` | `local`, `local-dev`, `developer` |
+| `small-company` | `small` |
+| `gpu-server` | `gpu` |
+| `dgx-enterprise` | `dgx`, `dgx-spark`, `enterprise` |
+| `hybrid-gateway` | `hybrid` |
+| `dry-run-only` | `dry-run`, `planning` |
+
+## Test Command
+
+```bash
+python -m unittest discover -s tests -v
+```
+

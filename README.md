@@ -1,0 +1,245 @@
+# Private AI Infrastructure Blueprint
+
+Status: early open-source blueprint with a working dry-run CLI. Local RAG runtime is not implemented yet.
+
+Build and deploy private AI systems for developer workspaces, company documents, RAG assistants, GPU servers, DGX Spark, and enterprise environments without sending sensitive data to public AI tools by default.
+
+This repository defines a security-first reference architecture for deploying private AI inside a trusted company environment. It is designed for developers, small companies, and enterprise teams that want practical AI integration without guessing through data privacy, networking, RBAC, audit logging, model runtime, and deployment decisions.
+
+The project started documentation-led, and now includes the first usable CLI milestone: `private-ai init --dry-run` generates a review pack without applying infrastructure changes.
+
+## Why Star This Project
+
+Star this repo if you want an open-source path for:
+
+- Adding AI to a developer workspace without exposing private files.
+- Building RAG over approved company documents.
+- Running local AI with Ollama, vLLM, NVIDIA NIM, or similar runtimes.
+- Planning GPU server, DGX Spark, or DGX-class deployments.
+- Generating dry-run configs before touching real infrastructure.
+- Adding RBAC, audit logs, and safe ingestion from day one.
+- Helping build a vendor-neutral private AI deployment blueprint.
+
+The 10k-star goal is not cosmetic. It means enough developers care about private, useful, security-aware AI infrastructure that the ecosystem can grow around it.
+
+## Open-Source Mission
+
+The goal is to help developers and companies integrate AI into real workspaces safely:
+
+- A developer should be able to test private AI over approved local files.
+- A small company should be able to run a private document assistant without enterprise hardware.
+- A GPU workstation or DGX Spark user should have a clearer path to a stronger local AI deployment.
+- An enterprise team should have reviewable architecture, security, networking, and audit documentation before production.
+
+This should become a practical open-source starting point, not a vendor-locked demo.
+
+## Who This Is For
+
+- Developers building local AI assistants over approved docs or code.
+- Teams adding RAG to internal knowledge bases.
+- Startups and small companies that need private document search.
+- Security teams reviewing AI before company rollout.
+- Infra teams deploying on GPU servers or DGX-class hardware.
+- AI engineers choosing model, embedding, and retrieval architecture.
+- Open-source contributors who want private AI to be easier and safer.
+
+## What This Project Is
+
+Private AI Infrastructure Blueprint is a guided deployment plan for private AI systems across:
+
+- Local developer machines
+- Small company servers
+- GPU workstations or DGX-class systems
+- Hybrid cloud gateway patterns
+- Dry-run planning-only environments
+
+The intended product is a CLI and application stack that can ask role-specific setup questions, generate deployment configs, validate risky settings, run a local RAG system, and keep audit evidence for sensitive operations.
+
+Current implementation:
+
+- Python package skeleton
+- `private-ai init --dry-run`
+- Dry-run artifact generator
+- `private-ai validate`
+- `private-ai doctor`
+- Safety stubs for not-yet-implemented commands
+- Unit tests
+
+Not implemented yet:
+
+- Real Docker images
+- Local document ingestion
+- Vector database writes
+- Model inference
+- Web UI
+- `apply`, `ingest`, `chat`, and `audit`
+
+## Quickstart
+
+Requirements:
+
+- Python 3.11+
+
+Install locally:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e .
+```
+
+Generate a safe dry-run plan:
+
+```bash
+private-ai init --dry-run --mode local-developer --project-name private-ai-demo --output-dir generated/dry-run --force
+```
+
+Validate the generated review pack:
+
+```bash
+private-ai validate generated/dry-run
+```
+
+Inspect local readiness:
+
+```bash
+private-ai doctor
+```
+
+Run tests:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Dry-run output is written under `generated/dry-run/` and is intentionally ignored by Git except for `generated/.gitkeep`.
+
+## Core Principles
+
+- Private by default
+- Dry-run before apply
+- Least privilege access
+- Explicit data-source approval
+- Role-based configuration
+- Human approval for risky actions
+- Audit every sensitive action
+- No direct internet exposure of model runtimes
+
+## MVP Target
+
+The first implementation should stay narrow:
+
+```text
+User
+  -> Web UI or CLI
+  -> Auth and role check
+  -> FastAPI backend
+  -> RAG pipeline
+  -> Vector database
+  -> Local LLM runtime
+  -> Answer with citations
+```
+
+MVP capabilities:
+
+- Guided setup wizard
+- Dry-run mode that generates plans but applies nothing
+- Docker Compose local deployment
+- Local document ingestion from approved paths
+- RAG Q&A with citations
+- YAML-based RBAC
+- Audit logging
+- Basic admin/config summary
+- Read-only developer assistant mode
+- Read-only cyber log summarizer over sample logs
+
+## Documentation Map
+
+- [Vision](docs/vision.md)
+- [Open-Source Mission](docs/open-source-mission.md)
+- [GitHub Growth Strategy](docs/github-growth-strategy.md)
+- [Launch Checklist](docs/launch-checklist.md)
+- [CLI Reference](docs/cli-reference.md)
+- [Developer Workflow](docs/developer-workflow.md)
+- [Project Investigation](docs/project-investigation.md)
+- [Architecture](docs/architecture.md)
+- [Deployment Modes](docs/deployment-modes.md)
+- [Hardware And Runtime Options](docs/hardware-and-runtime-options.md)
+- [Dry-Run Mode](docs/dry-run-mode.md)
+- [Stakeholder Workflow](docs/stakeholder-workflow.md)
+- [Security Principles](docs/security-principles.md)
+- [Threat Model](docs/threat-model.md)
+- [Configuration Reference](docs/configuration-reference.md)
+- [MVP Scope](docs/mvp-scope.md)
+- [Roadmap](docs/roadmap.md)
+
+The original long-form blueprint remains available at [README_private_ai_infra_blueprint.md](README_private_ai_infra_blueprint.md).
+
+## CLI Status
+
+Implemented:
+
+```bash
+private-ai init --dry-run
+private-ai validate
+private-ai doctor
+```
+
+Planned but intentionally blocked in v0.1:
+
+```bash
+private-ai apply
+private-ai ingest
+private-ai chat
+private-ai audit
+```
+
+No production-impacting command should run before validation passes.
+
+## Launch Readiness
+
+This project should not be promoted heavily until it has at least:
+
+- A clear README and docs
+- Apache 2.0 license
+- Contributing and security policy
+- Dry-run CLI skeleton
+- Example generated config pack
+- Local RAG MVP plan
+- Safe default deployment story
+- Issue templates for contributors
+
+The launch plan is tracked in [docs/launch-checklist.md](docs/launch-checklist.md).
+
+## Contributing And Security
+
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+- Read [SECURITY.md](SECURITY.md) before reporting security-sensitive issues.
+- Follow [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) in project spaces.
+- Do not commit real company data, credentials, logs, secrets, or private keys.
+- Keep examples runnable on normal developer machines unless the example is explicitly for GPU or DGX-class deployments.
+
+## Suggested Repository Shape
+
+```text
+private-ai-infra-blueprint/
+  README.md
+  docs/
+  wizard/
+  app/
+    backend/
+    ui/
+  configs/
+    examples/
+  deployment/
+  examples/
+  generated/
+  tests/
+  pyproject.toml
+```
+
+The current repository contains documentation plus the first Python CLI implementation. The application runtime structure above is the planned next implementation path.
+
+## License Recommendation
+
+This project uses the Apache License 2.0. That license is a good fit for open-source infrastructure because it includes explicit patent protection.

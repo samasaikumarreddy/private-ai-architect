@@ -1,0 +1,38 @@
+# Example RBAC policy. Review before production use.
+roles:
+  manager:
+    can_chat: true
+    can_ingest: false
+    can_view_audit: false
+    can_manage_users: false
+    collections:
+      - policies
+      - reports
+
+  developer:
+    can_chat: true
+    can_ingest: true
+    can_view_audit: false
+    can_manage_users: false
+    collections:
+      - docs
+      - codebase
+
+  security_analyst:
+    can_chat: true
+    can_ingest: false
+    can_view_audit: true
+    can_manage_users: false
+    collections:
+      - security_logs
+      - incident_reports
+
+  admin:
+    can_chat: true
+    can_ingest: true
+    can_view_audit: true
+    can_manage_users: true
+    requires_explicit_assignment: true
+    collections:
+      - "*"
+

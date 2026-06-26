@@ -1,0 +1,6 @@
+2026-06-26T09:00:11Z auth success user=alex@example.com source_ip=10.0.1.25 method=sso
+2026-06-26T09:02:42Z auth failure user=casey@example.com source_ip=203.0.113.10 method=password reason=invalid_password
+2026-06-26T09:03:01Z auth failure user=casey@example.com source_ip=203.0.113.10 method=password reason=invalid_password
+2026-06-26T09:03:28Z auth failure user=casey@example.com source_ip=203.0.113.10 method=password reason=invalid_password
+2026-06-26T09:05:55Z auth success user=casey@example.com source_ip=10.0.1.44 method=sso
+

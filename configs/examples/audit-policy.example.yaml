@@ -1,0 +1,23 @@
+# Example audit policy. Do not log raw secrets.
+audit:
+  required: true
+  retention_days: 90
+  log_prompts: redacted
+  log_responses: metadata_only
+  log_query_hash: true
+  log_source_documents: true
+  immutable_export:
+    enabled: false
+    destination: not_configured
+
+events:
+  - validation_run
+  - config_generated
+  - apply_attempted
+  - ingestion_started
+  - ingestion_completed
+  - ingestion_failed
+  - rag_query
+  - admin_change
+  - auth_event
+

@@ -1,0 +1,35 @@
+# Example data-source policy. Use allowlists before broad discovery.
+sources:
+  - name: sample_company_policies
+    type: folder
+    path: ./examples/sample-company-docs/policies
+    collection: policies
+    approved_by: data-owner@example.com
+    schedule: manual
+
+  - name: sample_engineering_docs
+    type: folder
+    path: ./examples/sample-company-docs/engineering
+    collection: docs
+    approved_by: data-owner@example.com
+    schedule: manual
+
+denied_patterns:
+  - "**/.env"
+  - "**/.env.*"
+  - "**/*.pem"
+  - "**/*.key"
+  - "**/id_rsa"
+  - "**/id_ed25519"
+  - "**/credentials*"
+  - "**/secrets*"
+  - "**/*token*"
+
+metadata:
+  required:
+    - source_name
+    - collection
+    - approved_by
+    - ingested_at
+    - checksum
+
