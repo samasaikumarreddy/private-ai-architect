@@ -47,12 +47,14 @@ Implemented in v0.1:
 - `private-ai init --dry-run`
 - `private-ai validate`
 - `private-ai doctor`
+- `private-ai modes`
 - Generated dry-run review pack
+- Machine-readable dry-run metadata
 - Unit tests
 
 Still needed:
 
-- Interactive wizard prompts
+- More complete interactive wizard prompts
 - Richer answer schema
 - More role-specific question sets
 - More validation rules

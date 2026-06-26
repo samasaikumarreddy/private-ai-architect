@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import json
 from pathlib import Path
 
 from .models import DryRunAnswers, get_profile
@@ -34,6 +35,8 @@ def generate_dry_run(
         "proposed-env.example": _proposed_env,
         "data-source-plan.md": _data_source_plan,
         "model-plan.md": _model_plan,
+        "answers.json": _answers_json,
+        "dry-run-summary.json": _dry_run_summary_json,
     }
 
     for filename, writer in writers.items():
@@ -431,6 +434,38 @@ Generated: {answers.created_at}
 """
 
 
+def _answers_json(answers: DryRunAnswers) -> str:
+    return json.dumps(asdict(answers), indent=2, sort_keys=True) + "\n"
+
+
+def _dry_run_summary_json(answers: DryRunAnswers) -> str:
+    profile = get_profile(answers.mode)
+    summary = {
+        "applied": False,
+        "company_name": answers.company_name,
+        "generated_at": answers.created_at,
+        "generated_files": list(REQUIRED_DRY_RUN_FILES),
+        "mode": answers.mode,
+        "mode_title": profile.title,
+        "mutations_performed": [],
+        "next_commands": [
+            "private-ai validate generated/dry-run",
+            "review generated/dry-run/*.md",
+        ],
+        "project_name": answers.project_name,
+        "safety_guarantees": [
+            "no containers started",
+            "no firewall changes",
+            "no users created",
+            "no VPN configuration applied",
+            "no real company data ingested",
+            "no ports exposed",
+        ],
+        "status": "dry_run_only",
+    }
+    return json.dumps(summary, indent=2, sort_keys=True) + "\n"
+
+
 def _bullet_list(values: tuple[str, ...]) -> str:
     return "\n".join(f"- {value}" for value in values)
 
@@ -449,4 +484,3 @@ def _json_like(values: dict[str, object]) -> str:
         lines.append(f'  "{key}": {rendered}{comma}')
     lines.append("}")
     return "\n".join(lines)
-

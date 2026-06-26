@@ -36,7 +36,9 @@ class CliTests(unittest.TestCase):
     def test_init_without_dry_run_is_blocked(self):
         self.assertEqual(main(["init"]), 2)
 
+    def test_modes_command(self):
+        self.assertEqual(main(["modes"]), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -60,8 +60,11 @@ Current implementation:
 - Python package skeleton
 - `private-ai init --dry-run`
 - Dry-run artifact generator
+- Machine-readable dry-run metadata
 - `private-ai validate`
 - `private-ai doctor`
+- `private-ai modes`
+- Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
 - Unit tests
 
@@ -183,6 +186,7 @@ Implemented:
 private-ai init --dry-run
 private-ai validate
 private-ai doctor
+private-ai modes
 ```
 
 Planned but intentionally blocked in v0.1:

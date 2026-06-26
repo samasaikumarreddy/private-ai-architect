@@ -62,7 +62,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Directory for generated dry-run artifacts.",
     )
     init_parser.add_argument("--force", action="store_true", help="Overwrite generated dry-run files.")
+    init_parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="Prompt for dry-run answers instead of using defaults and flags.",
+    )
     init_parser.set_defaults(handler=handle_init)
+
+    modes_parser = subparsers.add_parser("modes", help="List supported deployment modes.")
+    modes_parser.set_defaults(handler=handle_modes)
 
     validate_parser = subparsers.add_parser("validate", help="Validate generated dry-run artifacts.")
     validate_parser.add_argument("path", nargs="?", default="generated/dry-run", help="Dry-run artifact directory.")
@@ -83,14 +91,7 @@ def handle_init(args: argparse.Namespace) -> int:
         print("Only dry-run init is implemented in v0.1. Use: private-ai init --dry-run")
         return 2
 
-    mode = normalize_mode(args.mode)
-    answers = default_answers(
-        mode=mode,
-        project_name=args.project_name,
-        company_name=args.company_name,
-        departments=tuple(args.departments) if args.departments else None,
-        allowed_data_sources=tuple(args.data_sources) if args.data_sources else None,
-    )
+    answers = _prompt_for_answers(args) if args.interactive else _answers_from_args(args)
     output_dir = Path(args.output_dir)
     generated = generate_dry_run(output_dir, answers, force=args.force)
 
@@ -114,6 +115,15 @@ def handle_doctor(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_modes(args: argparse.Namespace) -> int:
+    for mode, profile in sorted(DEPLOYMENT_PROFILES.items()):
+        print(f"{mode}: {profile.title}")
+        print(f"  Audience: {profile.audience}")
+        print(f"  Runtime: {profile.default_runtime}")
+        print(f"  Vector DB: {profile.default_vector_db}")
+    return 0
+
+
 def handle_not_implemented(args: argparse.Namespace) -> int:
     print(
         f"`private-ai {args.command}` is intentionally not implemented yet. "
@@ -122,6 +132,44 @@ def handle_not_implemented(args: argparse.Namespace) -> int:
     return 2
 
 
+def _answers_from_args(args: argparse.Namespace):
+    mode = normalize_mode(args.mode)
+    return default_answers(
+        mode=mode,
+        project_name=args.project_name,
+        company_name=args.company_name,
+        departments=tuple(args.departments) if args.departments else None,
+        allowed_data_sources=tuple(args.data_sources) if args.data_sources else None,
+    )
+
+
+def _prompt_for_answers(args: argparse.Namespace):
+    print("Private AI dry-run wizard. Press Enter to accept defaults.")
+    mode = _ask("Mode", args.mode)
+    normalized_mode = normalize_mode(mode)
+    project_name = _ask("Project name", args.project_name)
+    company_name = _ask("Company or workspace name", args.company_name)
+    departments = _split_csv(_ask("Departments", ",".join(args.departments or ["engineering", "security"])))
+    data_sources = _split_csv(
+        _ask("Approved data sources", ",".join(args.data_sources or ["./examples/sample-company-docs"]))
+    )
+    return default_answers(
+        mode=normalized_mode,
+        project_name=project_name,
+        company_name=company_name,
+        departments=tuple(departments),
+        allowed_data_sources=tuple(data_sources),
+    )
+
+
+def _ask(label: str, default: str) -> str:
+    value = input(f"{label} [{default}]: ").strip()
+    return value or default
+
+
+def _split_csv(value: str) -> list[str]:
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
-

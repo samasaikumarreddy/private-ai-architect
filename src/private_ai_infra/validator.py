@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 
 
@@ -14,6 +15,8 @@ VALIDATION_INPUT_FILES = (
     "proposed-env.example",
     "data-source-plan.md",
     "model-plan.md",
+    "answers.json",
+    "dry-run-summary.json",
 )
 
 
@@ -151,6 +154,30 @@ def validate_dry_run(path: Path) -> ValidationResult:
             errors.append("security-review.md must include model runtime exposure control.")
         if "private keys" not in security_text:
             warnings.append("security-review.md should mention private-key exclusion.")
+
+    answers_path = path / "answers.json"
+    if answers_path.exists():
+        try:
+            answers = json.loads(answers_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            errors.append(f"answers.json is not valid JSON: {exc}")
+        else:
+            if not answers.get("mode"):
+                errors.append("answers.json must include mode.")
+            if answers.get("audit_logging_required") is not True:
+                errors.append("answers.json must require audit logging.")
+
+    summary_path = path / "dry-run-summary.json"
+    if summary_path.exists():
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            errors.append(f"dry-run-summary.json is not valid JSON: {exc}")
+        else:
+            if summary.get("applied") is not False:
+                errors.append("dry-run-summary.json must record applied=false.")
+            if summary.get("mutations_performed") != []:
+                errors.append("dry-run-summary.json must record no mutations.")
 
     return ValidationResult(
         path=path,

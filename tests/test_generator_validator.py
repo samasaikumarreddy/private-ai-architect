@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,6 +27,12 @@ class GeneratorValidatorTests(unittest.TestCase):
             result = validate_dry_run(output)
             self.assertTrue(result.ok, result.to_text())
             self.assertIn("proposed-env.example", result.checked_files)
+
+            answers = json.loads((output / "answers.json").read_text(encoding="utf-8"))
+            summary = json.loads((output / "dry-run-summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(answers["mode"], "local-developer")
+            self.assertFalse(summary["applied"])
+            self.assertEqual(summary["mutations_performed"], [])
 
     def test_generate_dry_run_requires_force_for_existing_files(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -76,4 +83,3 @@ class GeneratorValidatorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

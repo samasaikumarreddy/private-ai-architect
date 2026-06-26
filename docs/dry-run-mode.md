@@ -47,6 +47,8 @@ generated/
     proposed-env.example
     data-source-plan.md
     model-plan.md
+    answers.json
+    dry-run-summary.json
     validation-report.md
 ```
 
@@ -101,4 +103,3 @@ private-ai apply generated/dry-run
 ```
 
 `apply` should refuse to run if validation has not passed or if the dry-run pack contains unresolved blocking findings.
-

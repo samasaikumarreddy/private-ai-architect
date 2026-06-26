@@ -141,6 +141,8 @@ Decisions already made for v0.1:
 - Added GitHub-ready open-source files: `LICENSE`, `NOTICE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.gitignore`, issue templates, and a pull request template.
 - Added a Python package skeleton and first CLI implementation.
 - Added tests for modes, generation, validation, and CLI behavior.
+- Added machine-readable dry-run metadata: `answers.json` and `dry-run-summary.json`.
+- Added optional interactive dry-run prompts and `private-ai modes`.
 - Added committed example configs and safe synthetic sample docs/logs.
 - Added GitHub Actions CI and a Makefile.
 - Checked local Markdown links from `README.md`.
@@ -154,3 +156,4 @@ Runtime verification:
 - `python -m private_ai_infra init --dry-run --mode local-developer --project-name smoke-test --company-name local --output-dir generated/dry-run --force` passed.
 - `python -m private_ai_infra validate generated/dry-run` passed.
 - `python -m private_ai_infra doctor` ran and reported local environment checks.
+- `private-ai modes` passed.

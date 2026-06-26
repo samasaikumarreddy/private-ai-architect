@@ -21,6 +21,7 @@ source .venv/bin/activate
 ```bash
 private-ai --help
 private-ai --version
+private-ai modes
 private-ai init --dry-run
 private-ai validate
 private-ai doctor
@@ -56,6 +57,8 @@ generated/dry-run/
   proposed-env.example
   data-source-plan.md
   model-plan.md
+  answers.json
+  dry-run-summary.json
   validation-report.md
 ```
 
@@ -102,6 +105,22 @@ The doctor command reports local readiness signals:
 
 Missing Docker, Ollama, or NVIDIA tooling is reported as a warning, not an immediate failure. CPU-only local planning is still valid.
 
+## List Modes
+
+```bash
+private-ai modes
+```
+
+This prints the supported deployment modes with their default runtime and vector database.
+
+## Optional Interactive Wizard
+
+```bash
+private-ai init --dry-run --interactive
+```
+
+The interactive path prompts for mode, project name, company/workspace name, departments, and approved data sources. It still performs dry-run generation only.
+
 ## Deployment Modes
 
 Supported mode names and aliases:
@@ -120,4 +139,3 @@ Supported mode names and aliases:
 ```bash
 python -m unittest discover -s tests -v
 ```
-
