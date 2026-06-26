@@ -1,4 +1,4 @@
-.PHONY: help install test dry-run validate doctor clean
+.PHONY: help install test dry-run validate ingest chat doctor clean
 
 help:
 	@echo "Targets:"
@@ -6,6 +6,8 @@ help:
 	@echo "  test      Run unit tests"
 	@echo "  dry-run   Generate local dry-run review pack"
 	@echo "  validate  Validate generated dry-run review pack"
+	@echo "  ingest    Build local JSON index from sample docs"
+	@echo "  chat      Query local JSON index with cited excerpts"
 	@echo "  doctor    Inspect local readiness"
 	@echo "  clean     Remove generated dry-run output"
 
@@ -21,9 +23,15 @@ dry-run:
 validate:
 	private-ai validate generated/dry-run
 
+ingest:
+	private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+
+chat:
+	private-ai chat "AI usage rules" --index generated/index/index.json
+
 doctor:
 	private-ai doctor
 
 clean:
 	python -c "import shutil; shutil.rmtree('generated/dry-run', ignore_errors=True)"
-
+	python -c "import shutil; shutil.rmtree('generated/index', ignore_errors=True)"

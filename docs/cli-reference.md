@@ -25,14 +25,14 @@ private-ai modes
 private-ai init --dry-run
 private-ai validate
 private-ai doctor
+private-ai ingest
+private-ai chat
 ```
 
 Planned but not implemented:
 
 ```bash
 private-ai apply
-private-ai ingest
-private-ai chat
 private-ai audit
 ```
 
@@ -104,6 +104,24 @@ The doctor command reports local readiness signals:
 - NVIDIA GPU tooling availability
 
 Missing Docker, Ollama, or NVIDIA tooling is reported as a warning, not an immediate failure. CPU-only local planning is still valid.
+
+## Retrieval-Only Local Preview
+
+Build a local JSON index:
+
+```bash
+private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+```
+
+Ask a retrieval-only question:
+
+```bash
+private-ai chat "what are the AI usage rules?" --index generated/index/index.json
+```
+
+This returns cited source excerpts from the local index. It does not call an LLM, write to a vector database, or generate a model answer in v0.1.
+
+Ingestion skips denied secret patterns such as `.env`, private keys, credentials files, and token-like file names.
 
 ## List Modes
 

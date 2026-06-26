@@ -39,6 +39,20 @@ class CliTests(unittest.TestCase):
     def test_modes_command(self):
         self.assertEqual(main(["modes"]), 0)
 
+    def test_ingest_and_chat_retrieval_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            docs = root / "docs"
+            docs.mkdir()
+            (docs / "api.md").write_text("APIs require authentication and authorization checks.", encoding="utf-8")
+            index_dir = root / "index"
+
+            ingest_code = main(["ingest", str(docs), "--output-dir", str(index_dir)])
+            chat_code = main(["chat", "authorization checks", "--index", str(index_dir / "index.json")])
+
+            self.assertEqual(ingest_code, 0)
+            self.assertEqual(chat_code, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

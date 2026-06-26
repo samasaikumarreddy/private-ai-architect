@@ -37,5 +37,6 @@ jobs:
           private-ai --version
           private-ai init --dry-run --mode local-developer --project-name ci-smoke --company-name ci --output-dir generated/dry-run --force
           private-ai validate generated/dry-run
+          private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+          private-ai chat "AI usage rules" --index generated/index/index.json
           private-ai doctor
-

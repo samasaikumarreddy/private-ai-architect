@@ -143,6 +143,7 @@ Decisions already made for v0.1:
 - Added tests for modes, generation, validation, and CLI behavior.
 - Added machine-readable dry-run metadata: `answers.json` and `dry-run-summary.json`.
 - Added optional interactive dry-run prompts and `private-ai modes`.
+- Added retrieval-only local indexing and cited query preview through `private-ai ingest` and `private-ai chat`.
 - Added committed example configs and safe synthetic sample docs/logs.
 - Added GitHub Actions CI and a Makefile.
 - Checked local Markdown links from `README.md`.
@@ -157,3 +158,5 @@ Runtime verification:
 - `python -m private_ai_infra validate generated/dry-run` passed.
 - `python -m private_ai_infra doctor` ran and reported local environment checks.
 - `private-ai modes` passed.
+- `private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force` passed.
+- `private-ai chat "AI usage rules" --index generated/index/index.json` passed.

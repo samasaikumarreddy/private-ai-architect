@@ -36,6 +36,8 @@ The project is not ready for a broad local RAG launch yet because ingestion, mod
 - [x] `private-ai modes`
 - [x] Unit tests for the first CLI milestone
 - [x] Machine-readable dry-run metadata
+- [x] Retrieval-only local indexing preview
+- [x] Retrieval-only cited query preview
 - [x] Example config files
 - [x] Safe sample docs and sample cyber logs
 - [x] GitHub Actions CI
@@ -71,6 +73,7 @@ These should exist before asking large communities to try the project:
 - [x] Example Docker Compose output
 - [x] Config validator skeleton
 - [x] Machine-readable dry-run summary
+- [x] Local JSON index preview
 - [x] GitHub Actions CI
 - [x] Safe synthetic sample docs
 - [ ] Screenshots or terminal recording

@@ -42,6 +42,20 @@ make dry-run
 make validate
 ```
 
+## Run Retrieval Preview
+
+```bash
+private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+private-ai chat "AI usage rules" --index generated/index/index.json
+```
+
+Or:
+
+```bash
+make ingest
+make chat
+```
+
 ## Local Readiness Check
 
 ```bash
@@ -60,4 +74,3 @@ High-impact early contributions:
 - Add more safe example configs.
 - Improve generated review docs.
 - Add the local RAG MVP in small pieces.
-

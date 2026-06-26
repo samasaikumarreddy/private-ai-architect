@@ -108,13 +108,14 @@ Implemented:
 - Dry-run review pack generation
 - `private-ai validate`
 - `private-ai doctor`
+- `private-ai ingest` for local JSON indexing
+- `private-ai chat` for retrieval-only cited excerpts
 - Unit tests for the first CLI milestone
 
 Not implemented:
 
-- Interactive wizard
+- Full role-specific interactive wizard
 - Real Docker images
-- Local document ingestion
 - Vector database writes
 - Local model inference
 - Web UI

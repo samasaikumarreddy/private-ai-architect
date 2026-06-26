@@ -7,7 +7,9 @@ from pathlib import Path
 from . import __version__
 from .doctor import run_doctor
 from .generator import generate_dry_run
+from .indexer import build_index
 from .models import DEPLOYMENT_PROFILES, default_answers, normalize_mode
+from .retrieval import format_retrieval_answer, search_index
 from .validator import validate_dry_run
 
 
@@ -79,7 +81,20 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("doctor", help="Inspect local readiness for future deployment work.")
     doctor_parser.set_defaults(handler=handle_doctor)
 
-    for command in ("apply", "ingest", "chat", "audit"):
+    ingest_parser = subparsers.add_parser("ingest", help="Build a local retrieval index from approved files.")
+    ingest_parser.add_argument("sources", nargs="+", help="Approved files or directories to index.")
+    ingest_parser.add_argument("--collection", default="docs", help="Collection name for indexed chunks.")
+    ingest_parser.add_argument("--output-dir", default="generated/index", help="Directory for local index output.")
+    ingest_parser.add_argument("--force", action="store_true", help="Overwrite an existing local index.")
+    ingest_parser.set_defaults(handler=handle_ingest)
+
+    chat_parser = subparsers.add_parser("chat", help="Run retrieval-only query over a local index.")
+    chat_parser.add_argument("query", nargs="?", help="Question or search query.")
+    chat_parser.add_argument("--index", default="generated/index/index.json", help="Path to local JSON index.")
+    chat_parser.add_argument("--top-k", type=int, default=3, help="Number of cited excerpts to return.")
+    chat_parser.set_defaults(handler=handle_chat)
+
+    for command in ("apply", "audit"):
         stub = subparsers.add_parser(command, help=f"{command} is planned but not implemented yet.")
         stub.set_defaults(handler=handle_not_implemented)
 
@@ -115,6 +130,32 @@ def handle_doctor(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_ingest(args: argparse.Namespace) -> int:
+    result = build_index(
+        [Path(source) for source in args.sources],
+        output_dir=Path(args.output_dir),
+        collection=args.collection,
+        force=args.force,
+    )
+    print(result.to_text())
+    print("")
+    print(f"Next: private-ai chat \"your question\" --index {result.index_path}")
+    return 0
+
+
+def handle_chat(args: argparse.Namespace) -> int:
+    if not args.query:
+        print("error: query is required for retrieval-only chat", file=sys.stderr)
+        return 2
+    index_path = Path(args.index)
+    if not index_path.exists():
+        print(f"error: index does not exist: {index_path}. Run private-ai ingest first.", file=sys.stderr)
+        return 2
+    matches = search_index(index_path, args.query, top_k=args.top_k)
+    print(format_retrieval_answer(args.query, matches))
+    return 0
+
+
 def handle_modes(args: argparse.Namespace) -> int:
     for mode, profile in sorted(DEPLOYMENT_PROFILES.items()):
         print(f"{mode}: {profile.title}")
@@ -127,7 +168,7 @@ def handle_modes(args: argparse.Namespace) -> int:
 def handle_not_implemented(args: argparse.Namespace) -> int:
     print(
         f"`private-ai {args.command}` is intentionally not implemented yet. "
-        "The project currently supports dry-run planning and validation."
+        "The project currently supports dry-run planning, validation, and retrieval-only local preview."
     )
     return 2
 

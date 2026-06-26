@@ -48,8 +48,11 @@ Implemented in v0.1:
 - `private-ai validate`
 - `private-ai doctor`
 - `private-ai modes`
+- `private-ai ingest` for local JSON indexing
+- `private-ai chat` for retrieval-only cited excerpts
 - Generated dry-run review pack
 - Machine-readable dry-run metadata
+- Retrieval-only local preview
 - Unit tests
 
 Still needed:
@@ -59,6 +62,8 @@ Still needed:
 - More role-specific question sets
 - More validation rules
 - Pack promotion workflow
+- Real vector database ingestion
+- Real model-backed chat
 
 ## Phase 2: Local RAG MVP
 

@@ -64,6 +64,8 @@ Current implementation:
 - `private-ai validate`
 - `private-ai doctor`
 - `private-ai modes`
+- `private-ai ingest` for local JSON indexing
+- `private-ai chat` for retrieval-only cited excerpts
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
 - Unit tests
@@ -71,11 +73,10 @@ Current implementation:
 Not implemented yet:
 
 - Real Docker images
-- Local document ingestion
 - Vector database writes
 - Model inference
 - Web UI
-- `apply`, `ingest`, `chat`, and `audit`
+- `apply` and `audit`
 
 ## Quickstart
 
@@ -108,6 +109,15 @@ Inspect local readiness:
 ```bash
 private-ai doctor
 ```
+
+Try the retrieval-only local preview:
+
+```bash
+private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+private-ai chat "what are the AI usage rules?" --index generated/index/index.json
+```
+
+This returns cited source excerpts from a local JSON index. It does not call an LLM yet.
 
 Run tests:
 
@@ -187,14 +197,14 @@ private-ai init --dry-run
 private-ai validate
 private-ai doctor
 private-ai modes
+private-ai ingest
+private-ai chat
 ```
 
 Planned but intentionally blocked in v0.1:
 
 ```bash
 private-ai apply
-private-ai ingest
-private-ai chat
 private-ai audit
 ```
 
