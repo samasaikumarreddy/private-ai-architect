@@ -114,8 +114,12 @@ Implemented:
 - Optional local Ollama-backed answers over retrieved chunks
 - Installed-model preflight with no automatic downloads
 - Evidence-based refusal and graceful retrieval fallback
+- Citation-range validation for generated answers
+- Query-focused Markdown context
+- Loopback-only Ollama access
+- Documented real-model RTX smoke test
 - Denied-file patterns
-- Unit tests
+- 27 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented:
 
