@@ -1,8 +1,8 @@
 # CLI Reference
 
-The CLI supports dry-run planning, validation, local readiness inspection,
-safe local indexing, retrieval-only citations, and optional local
-Ollama-backed answers.
+The CLI supports guided architecture planning, blueprint validation, dry-run
+planning, local readiness inspection, safe local indexing, retrieval-only
+citations, and optional local Ollama-backed answers.
 
 ## Install For Local Development
 
@@ -30,6 +30,8 @@ private-ai doctor
 private-ai ingest
 private-ai chat
 private-ai evaluate
+private-ai architect
+private-ai blueprint validate
 ```
 
 Planned but not implemented:
@@ -44,9 +46,83 @@ behavior should not exist until validation, approval, and runtime code are
 ready.
 
 The longer-term guided lifecycle also includes provider-specific discovery,
-blueprint generation, verification, evidence export, shadowing, cutover, and
-rollback. Command names for those stages are not stable and must not be treated
-as implemented.
+verification, evidence export, shadowing, cutover, and rollback. Command names
+for those stages are not stable and must not be treated as implemented.
+
+## Guided Architect
+
+Start the interactive branching questionnaire:
+
+```bash
+private-ai architect
+```
+
+The first prompt selects `local-rag`, `private-gpu`, or `cloud-migration`.
+Questions that belong only to the other journeys are omitted.
+
+Run without prompts using reviewed flags:
+
+```bash
+private-ai architect \
+  --non-interactive \
+  --journey local-rag \
+  --project-name private-ai-demo \
+  --owner-name local \
+  --data-location local-workstation \
+  --document-source ./examples/sample-company-docs \
+  --user-count 1 \
+  --model-preference llama3.2:1b \
+  --runtime-preference ollama \
+  --hardware-availability "local workstation" \
+  --network-exposure localhost \
+  --compliance none \
+  --authentication-rbac "single approved local user" \
+  --audit-logging "local reviewed logs" \
+  --data-owner-approval approved \
+  --output-dir generated/architect \
+  --force
+```
+
+On PowerShell, use a JSON answers file to avoid shell line-continuation
+differences:
+
+```powershell
+private-ai architect `
+  --answers-file examples/architect/local-rag-answers.json `
+  --output-dir generated/architect `
+  --force
+```
+
+`--answers-file` is non-interactive. Matching command-line flags override file
+values. Source names are recorded as planning labels but are not opened or
+ingested.
+
+Generated files:
+
+```text
+generated/architect/
+  blueprint.json
+  summary.md
+  decisions-needed.md
+  security-risks.md
+  next-steps.md
+  validation-report.md
+```
+
+Validate the file or its containing directory:
+
+```bash
+private-ai blueprint validate generated/architect
+private-ai blueprint validate generated/architect/blueprint.json
+```
+
+Warnings flag public exposure, missing data-owner approval, unknown model or
+runtime choices, and planning-only hardware or cloud choices. Invalid schema,
+journey, checksum, or safety fields fail validation.
+
+The command never configures DGX or other hardware, calls Azure/AWS/Bedrock,
+discovers resources, changes a network, ingests company data, or applies
+infrastructure.
 
 ## Generate A Dry-Run Plan
 
@@ -201,7 +277,7 @@ private-ai modes
 
 This prints the supported deployment modes with their default runtime and vector database.
 
-## Optional Interactive Wizard
+## Legacy Dry-Run Interactive Wizard
 
 ```bash
 private-ai init --dry-run --interactive
@@ -209,9 +285,8 @@ private-ai init --dry-run --interactive
 
 The interactive path prompts for mode, project name, company/workspace name, departments, and approved data sources. It still performs dry-run generation only.
 
-This is not yet the planned branching question graph. Future versions will
-select local RAG, private hardware, or cloud migration intent before asking
-target-specific questions.
+This legacy prompt path remains for v0.1 dry-run compatibility. Use
+`private-ai architect` for the v0.3 branching question graph.
 
 ## Deployment Modes
 

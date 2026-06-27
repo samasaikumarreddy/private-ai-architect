@@ -11,8 +11,9 @@ secret-containing configuration.
 | --- | --- | --- |
 | v0.1 | Implemented and preserved | Dry-run planning, validation, readiness checks, and retrieval |
 | v0.2.0 | Released | Optional local Ollama answers, citations, refusal, and fallback |
-| v0.2.1 | Development candidate | BM25, evaluation, grounding checks, and bounded code ingestion |
-| v0.3+ | Planned | Commands will be added only after the feature is implemented |
+| v0.2.1 | Released | BM25, evaluation, grounding checks, and bounded code ingestion |
+| v0.3 | Implemented on development branch | Guided journeys, normalized blueprint, review documents, and validation |
+| v0.4+ | Planned | Commands will be added only after the feature is implemented |
 
 ## One-Time Setup
 
@@ -239,6 +240,51 @@ Review every skipped path and the generated index metadata before asking
 questions. Never ingest a repository root without reviewing its secret,
 generated, dependency, and dataset locations.
 
+## Test v0.3: Guided Architect Journeys
+
+Generate all three planning-only examples:
+
+```bash
+private-ai architect --answers-file examples/architect/local-rag-answers.json --output-dir generated/architect-local --force
+private-ai architect --answers-file examples/architect/private-gpu-answers.json --output-dir generated/architect-gpu --force
+private-ai architect --answers-file examples/architect/cloud-migration-answers.json --output-dir generated/architect-cloud --force
+```
+
+Expected results:
+
+- Each command writes `blueprint.json` and five Markdown review files.
+- Local RAG output has no cloud migration detail fields.
+- Private GPU output warns that DGX or GPU choices are planning-only.
+- Cloud migration output says no provider discovery was performed.
+- Every blueprint records `infrastructure_changes: false`.
+- No source document, cloud API, or hardware endpoint is opened.
+
+Validate each generated blueprint:
+
+```bash
+private-ai blueprint validate generated/architect-local
+private-ai blueprint validate generated/architect-gpu
+private-ai blueprint validate generated/architect-cloud
+```
+
+Schema validation must pass. Planning warnings are expected for unresolved,
+private GPU, and cloud migration choices.
+
+## Test v0.3: Safe Invalid-Journey Failure
+
+```bash
+private-ai architect --non-interactive --journey deploy-production --output-dir generated/invalid
+```
+
+Expected result:
+
+```text
+error: invalid journey 'deploy-production'. Allowed journeys: local-rag, private-gpu, cloud-migration
+```
+
+The command must exit non-zero and generate no deployment or infrastructure
+changes.
+
 ## Run The Automated Test Suite
 
 ```bash
@@ -305,6 +351,10 @@ Unsupported-question refusal: PASS / FAIL / NOT RUN
 Citation integrity: PASS / FAIL / NOT RUN
 Retrieval evaluation: PASS / FAIL / NOT RUN
 Source-code exclusions: PASS / FAIL / NOT RUN
+Local architect journey: PASS / FAIL / NOT RUN
+Private GPU planning journey: PASS / FAIL / NOT RUN
+Cloud migration planning journey: PASS / FAIL / NOT RUN
+Blueprint validation: PASS / FAIL / NOT RUN
 Automated tests: PASS / FAIL
 
 Notes:

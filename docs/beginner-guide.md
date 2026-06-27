@@ -4,11 +4,11 @@ This guide explains Private AI Architect without assuming that
 you already understand AI infrastructure, migration, RAG, vector databases, or
 GPU servers.
 
-> **Project status:** Basic dry-run planning, validation, machine checks,
-> document indexing, cited document search, and optional local
-> Ollama-generated answers work in v0.2. The complete guided questionnaire,
-> normalized blueprint, hardware deployment, cloud discovery, and migration
-> automation are planned.
+> **Project status:** Dry-run planning, validation, machine checks, document
+> indexing, cited local answers, and bounded source-code retrieval are
+> released through v0.2.1. The v0.3 development branch adds a guided
+> questionnaire, normalized blueprint, and review documents. Hardware
+> deployment, cloud discovery, and migration automation remain planned.
 
 ## The Project In One Minute
 
@@ -313,13 +313,13 @@ command refuses before invoking Ollama.
 | Local environment checks | Working |
 | Local file indexing with denied-file rules | Working |
 | Retrieval with source citations | Working |
-| Complete branching questionnaire | Planned |
-| Normalized versioned blueprint | Planned |
+| Three-journey branching questionnaire foundation | Working in v0.3 development |
+| Normalized versioned blueprint and review documents | Working in v0.3 development |
 | Optional local Ollama-generated answers | Working in v0.2 |
 | Unsupported-question refusal before model invocation | Working in v0.2 |
 | Invalid or missing model-citation fallback | Working in v0.2 |
-| BM25 ranking and retrieval evaluation | v0.2.1 development candidate |
-| Bounded source-code ingestion | v0.2.1 development candidate |
+| BM25 ranking and retrieval evaluation | Working in released v0.2.1 |
+| Bounded source-code ingestion | Working in released v0.2.1 |
 | Semantic embedding and vector database | Planned |
 | Web chat and administration interface | Planned |
 | Login, SSO, and production RBAC enforcement | Planned |
@@ -340,9 +340,9 @@ The basic local RAG loop now works. The next local priorities are:
 5. Package a later service stack only after its safety contract is tested.
 
 After that foundation is reliable, the project can add a web interface,
-authentication, stronger RBAC, a branching blueprint workflow, GPU server
-profiles, tested DGX Spark deployment guidance, narrow cloud discovery, and
-staged migration tooling.
+authentication, stronger RBAC, richer blueprint approval workflows, GPU
+server profiles, tested DGX Spark deployment guidance, narrow cloud discovery,
+and staged migration tooling.
 
 An optional later extension may combine normal RAG with a reviewed Markdown
 wiki that accumulates linked knowledge over time. The project may also detect

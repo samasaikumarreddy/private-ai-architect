@@ -66,9 +66,9 @@ Deferred beyond v0.2:
 
 ## v0.2.1: Local RAG Quality
 
-Status: development candidate.
+Status: released.
 
-Delivered on the development branch:
+Delivered:
 
 - BM25 ranking and relative relevance filtering
 - Stronger meaningful-term evidence coverage
@@ -89,19 +89,31 @@ v0.2.1.
 Goal: replace a flat setup wizard with a branching, versioned architecture
 workflow.
 
-Deliverables:
+Status: implemented on the v0.3 development branch.
+
+Delivered:
 
 - Early intent selection:
   - Build local RAG
-  - Configure private hardware
-  - Migrate cloud AI
+  - Plan private hardware requirements
+  - Plan a future cloud migration
 - Question graph with conditional branches
 - Normalized blueprint schema
 - Explicit unresolved decisions
 - Artifact provenance and blueprint checksums
-- Owner and approval model
-- Framework-aware advisory evidence fields
-- Promotion from proposed to validated state
+- Owner and data approval fields
+- Deterministic review documents
+- Blueprint schema and safety validation
+- Interactive prompts, flags, and JSON answers files
+- Planning-only warnings for private GPU, DGX, and cloud migration choices
+
+Deferred beyond v0.3:
+
+- Framework-specific advisory evidence
+- Approval workflow automation
+- Promotion beyond a validated planning state
+- Hardware configuration or compatibility verification
+- Provider discovery or migration execution
 
 Exit criteria:
 

@@ -62,6 +62,48 @@ private-ai validate generated/dry-run
 This generates proposed files only. It does not start services, modify the
 firewall, expose ports, create users, or apply infrastructure.
 
+## Generate A Guided Architecture Blueprint
+
+Use the included synthetic local-RAG answers:
+
+```bash
+private-ai architect --answers-file examples/architect/local-rag-answers.json --output-dir generated/architect --force
+private-ai blueprint validate generated/architect
+```
+
+This creates:
+
+```text
+generated/architect/
+  blueprint.json
+  summary.md
+  decisions-needed.md
+  security-risks.md
+  next-steps.md
+  validation-report.md
+```
+
+The answers file names an approved source but the architect command does not
+open or ingest that source. It only normalizes the provided planning answers.
+
+For interactive use:
+
+```bash
+private-ai architect
+```
+
+The first prompt chooses `local-rag`, `private-gpu`, or `cloud-migration`.
+Later prompts are limited to that journey. Private GPU and cloud migration
+choices remain planning-only and do not call hardware or provider APIs.
+
+Three non-interactive examples are included:
+
+```bash
+private-ai architect --answers-file examples/architect/local-rag-answers.json --output-dir generated/architect-local --force
+private-ai architect --answers-file examples/architect/private-gpu-answers.json --output-dir generated/architect-gpu --force
+private-ai architect --answers-file examples/architect/cloud-migration-answers.json --output-dir generated/architect-cloud --force
+```
+
 ## Build The Local Sample Index
 
 ```bash
@@ -152,8 +194,13 @@ python -m unittest discover -s tests -v
   included.
 - No infrastructure `apply`, firewall changes, cloud migration, or DGX
   configuration is implemented.
+- The v0.3 private GPU and cloud journeys normalize user-provided planning
+  answers only. They do not verify hardware or discover cloud resources.
 
 Read [Local RAG MVP](docs/local-rag-mvp.md) for the detailed behavior and
 security contract. Development details for BM25, evaluation, and bounded code
 ingestion are in
-[RAG Quality And Code Ingestion v0.2.1](docs/rag-quality-v0.2.1.md).
+[RAG Quality And Code Ingestion v0.2.1](docs/rag-quality-v0.2.1.md). The v0.3
+planning contract is documented in
+[Guided Architect Workflow](docs/guided-architect-workflow.md) and
+[Blueprint Schema](docs/blueprint-schema.md).
