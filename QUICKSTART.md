@@ -7,6 +7,10 @@ the deployment and source paths.
 For copy-and-paste checks organized by release, see the
 [Version Test Guide](docs/version-test-guide.md).
 
+For a beginner explanation of local-first, cloud-native, private GPU, and
+hybrid starting paths, read
+[Starting RAG From Scratch](docs/starting-rag-from-scratch.md).
+
 ## Requirements
 
 - Python 3.11 or newer

@@ -173,6 +173,28 @@ provider-specific milestones.
 Migration is incremental. The project must not imply that generating
 configuration is equivalent to proving production readiness.
 
+## Vendor-Aware RAG Direction
+
+Private AI Architect should not assume that every company wants to leave its
+existing cloud. If approved data, identity, logging, and governance already
+live in AWS or Azure, a cloud-native RAG plan may be safer than moving data to
+new local hardware.
+
+The guided product should eventually distinguish:
+
+- a first-time user starting RAG from zero
+- an existing environment choosing local, AWS-native, Azure-native, private
+  GPU/DGX, cloud GPU, Mac, or hybrid RAG
+- an existing AI workload explicitly choosing migration planning
+
+Provider-native recommendation requires additional normalized fields for
+cloud allowance, current data environment, use case, access model, read-only
+intent, and recommended architecture path. Those fields and recommendation
+rules are documented design work, not implemented v0.3 behavior.
+
+No recommendation may call provider APIs or deploy infrastructure. See
+[Starting RAG From Scratch](starting-rag-from-scratch.md).
+
 ## Controlled Lifecycle
 
 | Stage | Purpose | Mutation allowed? | Current status |

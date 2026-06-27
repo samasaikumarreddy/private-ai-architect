@@ -21,6 +21,11 @@ CLI, local RAG, dry-run planning, and a planning-only guided architect. The
 architect asks workflow-specific questions, records unknown decisions instead
 of guessing, and builds a normalized blueprint plus review documents.
 
+The product is not based on moving every workload away from cloud. It should
+recommend the safest RAG architecture inside the environment the user already
+trusts. That may eventually be local-first, AWS-native, Azure-native, private
+GPU/DGX, cloud GPU, Mac, or hybrid.
+
 The product supports three journeys:
 
 1. Build local RAG with a CPU, RTX GPU, or approved company GPU endpoint.
@@ -52,6 +57,8 @@ Star this repo if you want an open-source path for:
 - Integrating GPU servers or DGX Spark through guided compatibility,
   networking, identity, and operations questions.
 - Planning staged cloud-to-private AI migration with verification and rollback.
+- Planning cloud-native RAG when approved data and governance already live
+  inside that cloud boundary.
 - Generating dry-run configs before touching real infrastructure.
 - Adding RBAC, audit logs, and safe ingestion from day one.
 - Helping build a provider-neutral blueprint and plugin ecosystem.
@@ -293,6 +300,7 @@ cutover are later milestones. See the
 - [Quickstart](QUICKSTART.md)
 - [Version Test Guide](docs/version-test-guide.md)
 - [Beginner's Guide](docs/beginner-guide.md)
+- [Starting RAG From Scratch](docs/starting-rag-from-scratch.md)
 - [Vision](docs/vision.md)
 - [Guided Architect Workflow](docs/guided-architect-workflow.md)
 - [Blueprint Schema](docs/blueprint-schema.md)

@@ -409,6 +409,7 @@ must determine applicability and compliance.
 
 ## Where To Read Next
 
+- [Starting RAG From Scratch](starting-rag-from-scratch.md) for choosing a safe first architecture path.
 - [CLI Reference](cli-reference.md) for every available command.
 - [Guided Architect Workflow](guided-architect-workflow.md) for the three user journeys.
 - [Architecture](architecture.md) for engineering-level component details.

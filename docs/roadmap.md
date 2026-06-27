@@ -116,6 +116,20 @@ Deferred beyond v0.3:
 - Hardware configuration or compatibility verification
 - Provider discovery or migration execution
 
+Recorded schema follow-up, not implemented:
+
+- First-time RAG versus existing-environment intent
+- Current data environment
+- Cloud inference allowance
+- Primary RAG use case
+- Access model
+- Read-only versus write-capable intent
+- Recommended architecture path
+- Planning-only AWS-native, Azure-native, and hybrid recommendation rules
+
+These fields require a reviewed schema revision. They must not trigger cloud
+APIs, discovery, deployment, or migration.
+
 Exit criteria:
 
 - Local users do not see cloud migration questions.

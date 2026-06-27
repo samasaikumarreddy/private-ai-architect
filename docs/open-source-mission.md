@@ -101,17 +101,18 @@ The project should reject:
 
 Short description:
 
-> An open-source guided architect for local RAG, private GPU and DGX
-> deployments, and staged cloud-to-private AI migration with dry-run
-> generation, validation, approval boundaries, and evidence.
+> An open-source guided architect for choosing a safe local, cloud-native,
+> private GPU/DGX, or hybrid RAG architecture, with explicit migration
+> planning only when requested.
 
 Long description:
 
 > Private AI Infrastructure Blueprint asks workflow-specific architecture
 > questions, builds a normalized blueprint, generates proposed configuration
 > and migration artifacts, validates risks, and produces evidence for human
-> review. It starts with a working local RAG reference, expands to private GPU
-> and DGX targets, then adds narrow Azure and AWS migration paths.
+> review. It starts with a working local RAG reference and guided blueprint,
+> then expands to private hardware, cloud-native planning, hybrid boundaries,
+> and narrow provider-specific migration paths.
 
 ## What Good Contributions Look Like
 
