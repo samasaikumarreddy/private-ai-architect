@@ -79,3 +79,8 @@ Keep implementation status explicit. Do not describe planned Docker, vector
 database, web UI, MCP, hardware, cloud, or migration capabilities as working.
 Update `README.md`, `QUICKSTART.md`, `docs/local-rag-mvp.md`, and CLI reference
 when the local chat contract changes.
+
+Update `docs/version-test-guide.md` for every implemented version. Each version
+must include copy-and-paste commands, expected results, a safe failure or
+refusal test, and known limitations. Do not add runnable commands for planned
+features.

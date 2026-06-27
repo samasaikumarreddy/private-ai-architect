@@ -4,6 +4,9 @@ This quickstart uses only the synthetic documents included in the repository.
 Do not use real company files until the data owner and security team approve
 the deployment and source paths.
 
+For copy-and-paste checks organized by release, see the
+[Version Test Guide](docs/version-test-guide.md).
+
 ## Requirements
 
 - Python 3.11 or newer

@@ -236,6 +236,7 @@ cutover are later milestones. See the [Roadmap](docs/roadmap.md).
 ## Documentation Map
 
 - [Quickstart](QUICKSTART.md)
+- [Version Test Guide](docs/version-test-guide.md)
 - [Beginner's Guide](docs/beginner-guide.md)
 - [Vision](docs/vision.md)
 - [Guided Architect Workflow](docs/guided-architect-workflow.md)
