@@ -68,9 +68,10 @@ firewall, expose ports, create users, or apply infrastructure.
 private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
 ```
 
-The ingester supports approved Markdown, text, log, YAML, and JSON files. It
-skips likely secrets and credential files, including `.env`, private keys,
-tokens, credentials, and secret-like names.
+The ingester supports approved documents and common source-code formats. It
+prunes generated and dependency directories, rejects likely secret and signing
+file names, does not follow symbolic links, and enforces file-count and
+file-size limits. Use repeatable `--exclude` flags for project-specific paths.
 
 ## Retrieval-Only Chat
 
@@ -127,6 +128,15 @@ The v0.2 client accepts only these local endpoints:
 
 Remote Ollama servers and Ollama cloud models are outside this milestone.
 
+## Evaluate Retrieval Quality
+
+```bash
+private-ai evaluate --index generated/index/index.json --cases examples/evaluation/local-rag-cases.json
+```
+
+The included suite checks three supported questions and one unsupported
+question. All four must pass.
+
 ## Run Tests
 
 ```bash
@@ -135,7 +145,7 @@ python -m unittest discover -s tests -v
 
 ## Current Limitations
 
-- Retrieval uses the local lexical JSON index, not embeddings or Qdrant.
+- Retrieval uses local BM25 scoring, not embeddings or Qdrant.
 - Grounding is enforced through retrieval, evidence checks, prompting, and
   citations; model output can still be incorrect and must be verified.
 - No web interface, MCP server, runtime RBAC, or production audit database is
@@ -144,4 +154,6 @@ python -m unittest discover -s tests -v
   configuration is implemented.
 
 Read [Local RAG MVP](docs/local-rag-mvp.md) for the detailed behavior and
-security contract.
+security contract. Development details for BM25, evaluation, and bounded code
+ingestion are in
+[RAG Quality And Code Ingestion v0.2.1](docs/rag-quality-v0.2.1.md).

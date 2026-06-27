@@ -3,14 +3,15 @@
 [![CI](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml/badge.svg)](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/samasaikumarreddy/private-ai-architect)](LICENSE)
 
-Status: v0.2 local RAG is implemented. The CLI safely indexes approved local
+Status: v0.2.0 local RAG is released. The CLI safely indexes approved local
 documents, returns retrieval citations, optionally generates answers with an
 installed loopback Ollama model, validates citation numbers, and refuses
 unsupported questions. The release has 27 automated tests and a documented
 RTX 3060 Laptop GPU smoke test.
 
-Semantic vector retrieval, source-code ingestion, hardware deployment, and
-cloud migration are not implemented yet.
+The v0.2.1 development candidate adds BM25 ranking, evaluation cases, stricter
+claim-to-source checks, and bounded source-code ingestion. Semantic vector
+retrieval, hardware deployment, and cloud migration are not implemented yet.
 
 Plan, generate, validate, and eventually migrate private AI systems across
 developer machines, GPU servers, DGX Spark, and hybrid cloud environments.
@@ -74,8 +75,8 @@ This should become a practical open-source starting point, not a vendor-locked d
 
 ## Who This Is For
 
-- Developers building local AI assistants over approved documents today, with
-  source-code ingestion planned for a later version.
+- Developers building local AI assistants over approved documents, with
+  bounded source-code ingestion in the v0.2.1 development candidate.
 - Teams adding RAG to internal knowledge bases.
 - Startups and small companies that need private document search.
 - Security teams reviewing AI before company rollout.
@@ -121,17 +122,21 @@ Current implementation:
 - `private-ai doctor`
 - `private-ai modes`
 - `private-ai ingest` for local JSON indexing
+- Bounded source-code ingestion with default and operator-defined exclusions
 - `private-ai chat` for retrieval-only cited excerpts
 - Optional `private-ai chat --model <installed-model>` for local
   Ollama-generated answers with retrieval citations
 - Evidence-based refusal and graceful retrieval fallback
 - Citation-range validation that rejects missing or invented source numbers
+- Lexical claim-to-cited-source validation
+- BM25 ranking with relative relevance filtering
+- `private-ai evaluate` for repeatable retrieval and refusal cases
 - Query-focused Markdown sections to reduce unrelated model context
 - Loopback-only Ollama access with installed-model preflight
 - Verified `llama3.2:1b` smoke test on an RTX 3060 Laptop GPU
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
-- 27 unit tests and GitHub CI on Python 3.11 and 3.12
+- 39 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented yet:
 
@@ -222,7 +227,7 @@ Dry-run output is written under `generated/dry-run/` and is intentionally ignore
 - No compliance certification claims
 - Verification and rollback before production cutover
 
-## Current v0.2 Flow
+## Current v0.2.1 Development Flow
 
 The implemented local flow stays narrow:
 
@@ -231,27 +236,30 @@ User
   -> private-ai CLI
   -> approved local documents
   -> denied-file filtering
-  -> local lexical JSON index
+  -> local BM25 JSON index
   -> evidence check
   -> retrieval-only excerpts or local Ollama
   -> citation validation
   -> cited answer, safe fallback, or refusal
 ```
 
-Implemented v0.2 capabilities:
+Implemented local capabilities:
 
 - Dry-run mode that generates plans but applies nothing
 - Local document ingestion from approved paths
+- Bounded source-code ingestion with generated/dependency directory pruning
 - RAG Q&A with citations
 - Refusal when evidence is missing
 - Retrieval fallback when Ollama or its response is unavailable
 - Rejection of missing or out-of-range generated citations
+- Rejection of claims without lexical support in their cited source
+- Repeatable retrieval evaluation cases
 - Localhost-only model access
 - Automated tests and a documented RTX smoke test
 
 Semantic embeddings, vector storage, runtime RBAC, audit storage, web UI,
-source-code ingestion, cloud discovery, DGX Spark verification, hybrid
-gateways, and production cutover are later milestones. See the
+cloud discovery, DGX Spark verification, hybrid gateways, and production
+cutover are later milestones. See the
 [Roadmap](docs/roadmap.md).
 
 ## Documentation Map
@@ -269,6 +277,7 @@ gateways, and production cutover are later milestones. See the
 - [Project Investigation](docs/project-investigation.md)
 - [Architecture](docs/architecture.md)
 - [Local RAG MVP](docs/local-rag-mvp.md)
+- [RAG Quality And Code Ingestion v0.2.1](docs/rag-quality-v0.2.1.md)
 - [Knowledge Workspace And Memory Optimization](docs/knowledge-workspace-and-memory-optimization.md)
 - [Deployment Modes](docs/deployment-modes.md)
 - [Hardware And Runtime Options](docs/hardware-and-runtime-options.md)
@@ -293,6 +302,7 @@ private-ai doctor
 private-ai modes
 private-ai ingest
 private-ai chat
+private-ai evaluate
 ```
 
 Planned but intentionally blocked:

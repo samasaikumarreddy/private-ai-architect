@@ -6,8 +6,9 @@ from pathlib import Path
 
 from . import __version__
 from .doctor import run_doctor
+from .evaluation import evaluate_index
 from .generator import generate_dry_run
-from .indexer import build_index
+from .indexer import DEFAULT_MAX_FILE_BYTES, DEFAULT_MAX_FILES, build_index
 from .models import DEPLOYMENT_PROFILES, default_answers, normalize_mode
 from .ollama import DEFAULT_OLLAMA_URL, OllamaClient, OllamaError, is_refusal
 from .retrieval import (
@@ -104,6 +105,24 @@ def build_parser() -> argparse.ArgumentParser:
     ingest_parser.add_argument("sources", nargs="+", help="Approved files or directories to index.")
     ingest_parser.add_argument("--collection", default="docs", help="Collection name for indexed chunks.")
     ingest_parser.add_argument("--output-dir", default="generated/index", help="Directory for local index output.")
+    ingest_parser.add_argument(
+        "--exclude",
+        action="append",
+        default=[],
+        help="Directory, file name, or relative glob to exclude. Can be repeated.",
+    )
+    ingest_parser.add_argument(
+        "--max-file-bytes",
+        type=int,
+        default=DEFAULT_MAX_FILE_BYTES,
+        help=f"Maximum size of an indexed file. Default: {DEFAULT_MAX_FILE_BYTES} bytes.",
+    )
+    ingest_parser.add_argument(
+        "--max-files",
+        type=int,
+        default=DEFAULT_MAX_FILES,
+        help=f"Maximum number of files in one index. Default: {DEFAULT_MAX_FILES}.",
+    )
     ingest_parser.add_argument("--force", action="store_true", help="Overwrite an existing local index.")
     ingest_parser.set_defaults(handler=handle_ingest)
 
@@ -130,6 +149,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="Local Ollama request timeout in seconds.",
     )
     chat_parser.set_defaults(handler=handle_chat)
+
+    evaluate_parser = subparsers.add_parser(
+        "evaluate",
+        help="Run repeatable retrieval and refusal cases against a local index.",
+    )
+    evaluate_parser.add_argument("--index", default="generated/index/index.json", help="Path to local JSON index.")
+    evaluate_parser.add_argument(
+        "--cases",
+        default="examples/evaluation/local-rag-cases.json",
+        help="Path to retrieval evaluation cases.",
+    )
+    evaluate_parser.add_argument("--top-k", type=int, default=3, help="Maximum results considered per case.")
+    evaluate_parser.set_defaults(handler=handle_evaluate)
 
     for command in ("apply", "audit"):
         stub = subparsers.add_parser(command, help=f"{command} is planned but not implemented yet.")
@@ -173,6 +205,9 @@ def handle_ingest(args: argparse.Namespace) -> int:
         output_dir=Path(args.output_dir),
         collection=args.collection,
         force=args.force,
+        max_file_bytes=args.max_file_bytes,
+        max_files=args.max_files,
+        exclude_patterns=tuple(args.exclude),
     )
     print(result.to_text())
     print("")
@@ -219,6 +254,23 @@ def handle_chat(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_evaluate(args: argparse.Namespace) -> int:
+    if not 1 <= args.top_k <= 10:
+        print("error: --top-k must be between 1 and 10", file=sys.stderr)
+        return 2
+    index_path = Path(args.index)
+    cases_path = Path(args.cases)
+    if not index_path.exists():
+        print(f"error: index does not exist: {index_path}. Run private-ai ingest first.", file=sys.stderr)
+        return 2
+    if not cases_path.exists():
+        print(f"error: evaluation cases do not exist: {cases_path}.", file=sys.stderr)
+        return 2
+    report = evaluate_index(index_path, cases_path, top_k=args.top_k)
+    print(report.to_text())
+    return 0 if report.ok else 1
+
+
 def handle_modes(args: argparse.Namespace) -> int:
     for mode, profile in sorted(DEPLOYMENT_PROFILES.items()):
         print(f"{mode}: {profile.title}")
@@ -231,8 +283,8 @@ def handle_modes(args: argparse.Namespace) -> int:
 def handle_not_implemented(args: argparse.Namespace) -> int:
     print(
         f"`private-ai {args.command}` is intentionally not implemented yet. "
-        "The project currently supports dry-run planning, validation, local retrieval, "
-        "and optional local Ollama-backed chat."
+        "The project currently supports dry-run planning, validation, bounded local indexing, "
+        "retrieval evaluation, and optional local Ollama-backed chat."
     )
     return 2
 

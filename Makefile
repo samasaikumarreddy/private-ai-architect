@@ -1,4 +1,4 @@
-.PHONY: help install test dry-run validate ingest chat doctor clean
+.PHONY: help install test dry-run validate ingest evaluate chat doctor clean
 
 help:
 	@echo "Targets:"
@@ -7,6 +7,7 @@ help:
 	@echo "  dry-run   Generate local dry-run review pack"
 	@echo "  validate  Validate generated dry-run review pack"
 	@echo "  ingest    Build local JSON index from sample docs"
+	@echo "  evaluate  Run sample retrieval quality cases"
 	@echo "  chat      Query local JSON index with cited excerpts"
 	@echo "  doctor    Inspect local readiness"
 	@echo "  clean     Remove generated dry-run output"
@@ -25,6 +26,9 @@ validate:
 
 ingest:
 	private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+
+evaluate:
+	private-ai evaluate --index generated/index/index.json --cases examples/evaluation/local-rag-cases.json
 
 chat:
 	private-ai chat "AI usage rules" --index generated/index/index.json
