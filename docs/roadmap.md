@@ -33,6 +33,11 @@ Current limitations:
 
 Goal: prove the smallest useful private-AI deployment end to end.
 
+Status: in progress. The current v0.2 implementation adds optional
+Ollama-backed answers, citations, evidence refusal, and retrieval fallback over
+the existing lexical JSON index. Docker Compose, Qdrant, embeddings, and the
+private API remain open work in this milestone.
+
 Deliverables:
 
 - Docker Compose reference stack

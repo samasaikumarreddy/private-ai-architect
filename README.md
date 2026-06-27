@@ -1,8 +1,8 @@
 # Private AI Infrastructure Blueprint
 
-Status: early open-source guided architect with a working dry-run CLI and
-retrieval preview. The local RAG runtime, hardware deployment, and cloud
-migration paths are not implemented yet.
+Status: early open-source guided architect with a working dry-run CLI, local
+retrieval, and optional Ollama-backed cited answers. Semantic vector retrieval,
+hardware deployment, and cloud migration paths are not implemented yet.
 
 Plan, generate, validate, and eventually migrate private AI systems across
 developer machines, GPU servers, DGX Spark, and hybrid cloud environments.
@@ -28,6 +28,9 @@ applying infrastructure changes.
 **New to private AI?** Start with the [Beginner's Guide](docs/beginner-guide.md).
 It uses simple explanations and diagrams to show what works today and what the
 project will build next.
+
+**Ready to run it?** Follow [QUICKSTART.md](QUICKSTART.md) using the included
+synthetic documents.
 
 ## Why Star This Project
 
@@ -107,6 +110,9 @@ Current implementation:
 - `private-ai modes`
 - `private-ai ingest` for local JSON indexing
 - `private-ai chat` for retrieval-only cited excerpts
+- Optional `private-ai chat --model <installed-model>` for local
+  Ollama-generated answers with retrieval citations
+- Evidence-based refusal and graceful retrieval fallback
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
 - Unit tests
@@ -116,7 +122,7 @@ Not implemented yet:
 - Normalized blueprint and complete branching questionnaire
 - Real Docker images
 - Vector database writes
-- Model inference
+- Semantic embeddings and vector retrieval
 - Web UI
 - Cloud provider discovery
 - Hardware-verified DGX Spark profile
@@ -161,7 +167,18 @@ private-ai ingest examples/sample-company-docs --collection docs --output-dir ge
 private-ai chat "what are the AI usage rules?" --index generated/index/index.json
 ```
 
-This returns cited source excerpts from a local JSON index. It does not call an LLM yet.
+This invocation returns cited source excerpts from a local JSON index without
+calling a model.
+
+Optionally use an already-installed local Ollama model:
+
+```bash
+private-ai chat "what are the AI usage rules?" --index generated/index/index.json --model <installed-model>
+```
+
+The command verifies the model is installed and never downloads one. If local
+Ollama is unavailable, it returns the retrieval-only result with a warning.
+Only loopback Ollama URLs are accepted in v0.2.
 
 Run tests:
 
@@ -218,6 +235,7 @@ cutover are later milestones. See the [Roadmap](docs/roadmap.md).
 
 ## Documentation Map
 
+- [Quickstart](QUICKSTART.md)
 - [Beginner's Guide](docs/beginner-guide.md)
 - [Vision](docs/vision.md)
 - [Guided Architect Workflow](docs/guided-architect-workflow.md)
@@ -228,6 +246,7 @@ cutover are later milestones. See the [Roadmap](docs/roadmap.md).
 - [Developer Workflow](docs/developer-workflow.md)
 - [Project Investigation](docs/project-investigation.md)
 - [Architecture](docs/architecture.md)
+- [Local RAG MVP](docs/local-rag-mvp.md)
 - [Knowledge Workspace And Memory Optimization](docs/knowledge-workspace-and-memory-optimization.md)
 - [Deployment Modes](docs/deployment-modes.md)
 - [Hardware And Runtime Options](docs/hardware-and-runtime-options.md)
@@ -254,7 +273,7 @@ private-ai ingest
 private-ai chat
 ```
 
-Planned but intentionally blocked in v0.1:
+Planned but intentionally blocked:
 
 ```bash
 private-ai apply

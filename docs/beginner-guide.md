@@ -218,7 +218,8 @@ private-ai doctor
 ```
 
 A warning about Ollama is expected if it is not installed. Ollama is not needed
-for the current retrieval-only preview.
+for dry-run planning or retrieval-only search. It is needed only when the user
+explicitly passes `--model` for a local generated answer.
 
 ### 3. Generate A Safe Plan
 

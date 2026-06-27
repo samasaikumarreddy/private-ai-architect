@@ -4,9 +4,12 @@ This checklist defines what should exist before promoting the repository widely.
 
 ## Current Stage
 
-Current stage: v0.1 safe planning foundation and retrieval preview.
+Current stage: v0.2 local RAG implementation candidate.
 
-The project is not ready for a broad local RAG launch yet because ingestion, model inference, Docker images, and the UI are not implemented. It is ready to be shared as an early blueprint with a working dry-run CLI if the messaging is honest.
+The project now has safe local ingestion, retrieval, and optional
+Ollama-generated cited answers. It is not ready for a broad production launch:
+semantic retrieval, Docker services, runtime RBAC, audit storage, and the UI
+remain unimplemented.
 
 ## Pre-GitHub Checklist
 

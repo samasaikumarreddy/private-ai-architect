@@ -101,7 +101,7 @@ MVP is complete when a new user can:
 - CPU smoke test
 - Documented RTX smoke test
 
-## Current v0.1 Progress
+## Current v0.2 Progress
 
 Implemented:
 
@@ -111,6 +111,9 @@ Implemented:
 - Local readiness checks
 - Local JSON indexing
 - Retrieval-only cited excerpts
+- Optional local Ollama-backed answers over retrieved chunks
+- Installed-model preflight with no automatic downloads
+- Evidence-based refusal and graceful retrieval fallback
 - Denied-file patterns
 - Unit tests
 
@@ -121,8 +124,7 @@ Not implemented:
 - Docker runtime stack
 - Vector database writes
 - Embedding model
-- Local LLM inference
-- Model-generated answers
+- Semantic retrieval
 - Runtime RBAC and audit storage
 
 ## Safety Gate
