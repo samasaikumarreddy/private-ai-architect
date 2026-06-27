@@ -318,6 +318,8 @@ command refuses before invoking Ollama.
 | Optional local Ollama-generated answers | Working in v0.2 |
 | Unsupported-question refusal before model invocation | Working in v0.2 |
 | Invalid or missing model-citation fallback | Working in v0.2 |
+| BM25 ranking and retrieval evaluation | v0.2.1 development candidate |
+| Bounded source-code ingestion | v0.2.1 development candidate |
 | Semantic embedding and vector database | Planned |
 | Web chat and administration interface | Planned |
 | Login, SSO, and production RBAC enforcement | Planned |
@@ -331,12 +333,11 @@ command refuses before invoking Ollama.
 
 The basic local RAG loop now works. The next local priorities are:
 
-1. Improve retrieval quality and evaluation.
+1. Expand retrieval and grounding evaluation.
 2. Add local embeddings and a vector database.
-3. Add stronger checks for unsupported or ungrounded claims.
-4. Add source-code-aware ingestion with strict exclusions.
-5. Add runtime authentication, RBAC, and audit storage.
-6. Package a later service stack only after its safety contract is tested.
+3. Add natural-language entailment checks for grounded claims.
+4. Add runtime authentication, RBAC, and audit storage.
+5. Package a later service stack only after its safety contract is tested.
 
 After that foundation is reliable, the project can add a web interface,
 authentication, stronger RBAC, a branching blueprint workflow, GPU server

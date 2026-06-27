@@ -64,6 +64,26 @@ Deferred beyond v0.2:
 - Runtime RBAC and audit storage
 - Source-code-aware ingestion
 
+## v0.2.1: Local RAG Quality
+
+Status: development candidate.
+
+Delivered on the development branch:
+
+- BM25 ranking and relative relevance filtering
+- Stronger meaningful-term evidence coverage
+- Claim-to-cited-source lexical support checks
+- Repeatable `private-ai evaluate` cases
+- Bounded source-code ingestion
+- Default generated, dependency, credential, and signing exclusions
+- Operator-defined `--exclude` patterns
+- File-count and file-size limits
+- Backward compatibility with v0.2 JSON indexes
+
+This remains a lexical implementation. Semantic vector retrieval, runtime
+authorization, audit storage, and production deployment are not part of
+v0.2.1.
+
 ## v0.3: Guided Architect Core
 
 Goal: replace a flat setup wizard with a branching, versioned architecture

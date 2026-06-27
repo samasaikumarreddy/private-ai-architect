@@ -10,7 +10,8 @@ secret-containing configuration.
 | Version | Status | What this guide verifies |
 | --- | --- | --- |
 | v0.1 | Implemented and preserved | Dry-run planning, validation, readiness checks, and retrieval |
-| v0.2 | Current implementation | Optional local Ollama answers, citations, refusal, and fallback |
+| v0.2.0 | Released | Optional local Ollama answers, citations, refusal, and fallback |
+| v0.2.1 | Development candidate | BM25, evaluation, grounding checks, and bounded code ingestion |
 | v0.3+ | Planned | Commands will be added only after the feature is implemented |
 
 ## One-Time Setup
@@ -207,7 +208,36 @@ Before ingestion, exclude:
 - Generated datasets, temporary output, and large logs
 
 v0.2 does not index Kotlin, Java, Python, JavaScript, XML, or Gradle source
-files. Source-code-aware ingestion is future work.
+files. v0.2.1 adds bounded source-code ingestion.
+
+## Test v0.2.1: Retrieval Evaluation
+
+```bash
+private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+private-ai evaluate --index generated/index/index.json --cases examples/evaluation/local-rag-cases.json
+```
+
+Expected result: `Passed: 4/4`.
+
+## Test v0.2.1: Bounded Source-Code Ingestion
+
+```powershell
+$project = "C:\path\to\your-project"
+
+private-ai ingest $project `
+  --collection project-code `
+  --output-dir generated/project-code-index `
+  --exclude vendor `
+  --exclude third_party `
+  --exclude generated `
+  --max-files 5000 `
+  --max-file-bytes 1048576 `
+  --force
+```
+
+Review every skipped path and the generated index metadata before asking
+questions. Never ingest a repository root without reviewing its secret,
+generated, dependency, and dataset locations.
 
 ## Run The Automated Test Suite
 
@@ -273,6 +303,8 @@ Retrieval-only chat: PASS / FAIL
 Model-backed chat: PASS / FAIL / NOT RUN
 Unsupported-question refusal: PASS / FAIL / NOT RUN
 Citation integrity: PASS / FAIL / NOT RUN
+Retrieval evaluation: PASS / FAIL / NOT RUN
+Source-code exclusions: PASS / FAIL / NOT RUN
 Automated tests: PASS / FAIL
 
 Notes:

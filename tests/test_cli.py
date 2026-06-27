@@ -1,5 +1,6 @@
 from contextlib import redirect_stderr, redirect_stdout
 from io import BytesIO, StringIO, TextIOWrapper
+import json
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -67,13 +68,81 @@ class CliTests(unittest.TestCase):
             self.assertEqual(ingest_code, 0)
             self.assertEqual(chat_code, 0)
 
+    def test_ingest_cli_applies_user_exclusion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            project = root / "project"
+            (project / "src").mkdir(parents=True)
+            (project / "vendor").mkdir()
+            (project / "src" / "app.py").write_text("def approved(): return True", encoding="utf-8")
+            (project / "vendor" / "dependency.py").write_text("vendor-content", encoding="utf-8")
+            index_dir = root / "index"
+
+            code = main(
+                [
+                    "ingest",
+                    str(project),
+                    "--exclude",
+                    "vendor",
+                    "--output-dir",
+                    str(index_dir),
+                ]
+            )
+            payload = (index_dir / "index.json").read_text(encoding="utf-8")
+
+            self.assertEqual(code, 0)
+            self.assertIn("app.py", payload)
+            self.assertNotIn("vendor-content", payload)
+
+    def test_evaluate_command_reports_passing_cases(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            docs = root / "docs"
+            docs.mkdir()
+            (docs / "policy.md").write_text(
+                "AI usage rules require approved tools and allowed data.",
+                encoding="utf-8",
+            )
+            index_dir = root / "index"
+            self.assertEqual(main(["ingest", str(docs), "--output-dir", str(index_dir)]), 0)
+            cases = root / "cases.json"
+            cases.write_text(
+                json.dumps(
+                    {
+                        "cases": [
+                            {
+                                "id": "policy",
+                                "query": "What are the AI usage rules?",
+                                "expected_sources": ["policy.md"],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            output = StringIO()
+
+            with redirect_stdout(output):
+                code = main(
+                    [
+                        "evaluate",
+                        "--index",
+                        str(index_dir / "index.json"),
+                        "--cases",
+                        str(cases),
+                    ]
+                )
+
+            self.assertEqual(code, 0)
+            self.assertIn("Passed: 1/1", output.getvalue())
+
     def test_chat_with_ollama_returns_answer_and_retrieval_citations(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             docs = root / "docs"
             docs.mkdir()
             (docs / "policy.md").write_text(
-                "Approved AI tools may use only data that is allowed for that tool.",
+                "AI usage rules require approved AI tools to use only data allowed for that tool.",
                 encoding="utf-8",
             )
             index_dir = root / "index"

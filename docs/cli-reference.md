@@ -29,6 +29,7 @@ private-ai validate
 private-ai doctor
 private-ai ingest
 private-ai chat
+private-ai evaluate
 ```
 
 Planned but not implemented:
@@ -122,6 +123,19 @@ Build a local JSON index:
 private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
 ```
 
+v0.2.1 ingestion options:
+
+```text
+--exclude <name-or-relative-glob>  Repeatable project-specific exclusion
+--max-files 10000                 Maximum files added to one index
+--max-file-bytes 2097152          Maximum size of one indexed file
+```
+
+Common source-code formats are supported in v0.2.1. Generated, dependency,
+cache, signing, key, credential, and environment paths are denied by default.
+Symbolic links are not followed. Operators must still review project-specific
+paths and use `--exclude`.
+
 Ask a retrieval-only question:
 
 ```bash
@@ -148,7 +162,7 @@ Additional options:
 --top-k 3
 ```
 
-The v0.2 client:
+The local Ollama client:
 
 - Accepts only loopback Ollama URLs.
 - Checks the installed-model list before generation.
@@ -158,8 +172,26 @@ The v0.2 client:
 - Appends citations from retrieval.
 - Falls back to retrieval-only output when Ollama is unavailable.
 
-The index remains a lexical JSON index in v0.2. Vector database writes and
-semantic embeddings are not implemented.
+v0.2.1 uses BM25 over the local JSON index and remains backward compatible with
+v0.2 indexes. Vector database writes and semantic embeddings are not
+implemented.
+
+## Evaluate Retrieval
+
+```bash
+private-ai evaluate --index generated/index/index.json --cases examples/evaluation/local-rag-cases.json
+```
+
+Options:
+
+```text
+--index <path>   Local JSON index to evaluate
+--cases <path>   JSON file containing supported and unsupported query cases
+--top-k <1-10>   Maximum retrieved chunks considered for each case
+```
+
+The command exits `0` only when every case passes. It evaluates retrieval and
+pre-model refusal behavior; it does not invoke Ollama.
 
 ## List Modes
 

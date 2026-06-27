@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "ai-usage-policy",
+      "query": "What are the AI usage rules?",
+      "should_retrieve": true,
+      "expected_sources": [
+        "remote-work-policy.md"
+      ]
+    },
+    {
+      "id": "api-authorization",
+      "query": "What authorization is required before returning API data?",
+      "should_retrieve": true,
+      "expected_sources": [
+        "api-guidelines.md"
+      ]
+    },
+    {
+      "id": "remote-work-approval",
+      "query": "Who approves a remote work arrangement?",
+      "should_retrieve": true,
+      "expected_sources": [
+        "remote-work-policy.md"
+      ]
+    },
+    {
+      "id": "unsupported-moon-minerals",
+      "query": "What minerals are present on the moon?",
+      "should_retrieve": false,
+      "expected_sources": []
+    }
+  ]
+}

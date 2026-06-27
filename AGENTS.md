@@ -4,13 +4,15 @@ These instructions apply to the entire repository.
 
 ## Current Scope
 
-The active implementation milestone is v0.2 local RAG:
+The active implementation milestone is v0.2.1 local RAG quality:
 
 - Safe local indexing of explicitly approved files
 - Retrieval-only cited excerpts
 - Optional local Ollama-backed answers over retrieved chunks
 - Refusal when indexed evidence is insufficient
 - Localhost-only model access
+- BM25 ranking and repeatable retrieval evaluation
+- Bounded source-code ingestion with explicit exclusions
 
 Do not extend the current implementation into enterprise or migration features
 without a separately approved scope.
@@ -40,6 +42,7 @@ private-ai doctor
 private-ai modes
 private-ai ingest
 private-ai chat
+private-ai evaluate
 ```
 
 `private-ai chat` without `--model` must remain retrieval-only. Optional model
@@ -68,6 +71,7 @@ private-ai init --dry-run --mode local-developer --project-name private-ai-demo 
 private-ai validate generated/dry-run
 private-ai doctor
 private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force
+private-ai evaluate --index generated/index/index.json --cases examples/evaluation/local-rag-cases.json
 private-ai chat "What are the AI usage rules?" --index generated/index/index.json
 ```
 
@@ -77,8 +81,9 @@ Use only the synthetic example data committed under `examples/`.
 
 Keep implementation status explicit. Do not describe planned Docker, vector
 database, web UI, MCP, hardware, cloud, or migration capabilities as working.
-Update `README.md`, `QUICKSTART.md`, `docs/local-rag-mvp.md`, and CLI reference
-when the local chat contract changes.
+Update `README.md`, `QUICKSTART.md`, `docs/local-rag-mvp.md`,
+`docs/rag-quality-v0.2.1.md`, and CLI reference when the local chat or
+ingestion contract changes.
 
 Update `docs/version-test-guide.md` for every implemented version. Each version
 must include copy-and-paste commands, expected results, a safe failure or

@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import json
+import math
 import re
 import socket
 from typing import Callable
 import urllib.error
 import urllib.request
 from urllib.parse import urlparse
+
+from .retrieval import meaningful_terms
 
 
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
@@ -97,6 +100,7 @@ class OllamaClient:
         answer = _join_standalone_citations(content.strip())
         if not is_refusal(answer):
             _validate_grounded_citations(answer, source_count=len(matches))
+            _validate_claim_support(answer, matches)
         return answer
 
     def _require_installed_model(self, model: str) -> None:
@@ -198,6 +202,22 @@ def _validate_grounded_citations(answer: str, *, source_count: int) -> None:
             raise OllamaUnavailable("Ollama returned a citation without a claim.")
         if any(citation < 1 or citation > source_count for citation in citations):
             raise OllamaUnavailable("Ollama cited a source number that was not provided.")
+
+
+def _validate_claim_support(answer: str, matches: list[dict[str, object]]) -> None:
+    for line in (line.strip() for line in answer.splitlines() if line.strip()):
+        citation_numbers = [int(value) for value in _CITATION_PATTERN.findall(line)]
+        claim = _CITATION_PATTERN.sub("", line).strip(" -.,")
+        claim_terms = meaningful_terms(claim)
+        if not claim_terms:
+            raise OllamaUnavailable("Ollama returned a claim without meaningful source terms.")
+
+        source_terms: set[str] = set()
+        for citation_number in citation_numbers:
+            source_terms.update(meaningful_terms(str(matches[citation_number - 1].get("text", ""))))
+        required_terms = max(1, math.ceil(len(claim_terms) * 0.2))
+        if len(claim_terms & source_terms) < required_terms:
+            raise OllamaUnavailable("Ollama returned a claim not supported by its cited source text.")
 
 
 def _model_is_installed(requested: str, installed: set[str]) -> bool:

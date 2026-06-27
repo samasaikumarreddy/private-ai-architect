@@ -118,8 +118,11 @@ Implemented:
 - Query-focused Markdown context
 - Loopback-only Ollama access
 - Documented real-model RTX smoke test
+- BM25 ranking and repeatable retrieval evaluation
+- Claim-to-cited-source lexical support validation
+- Bounded source-code ingestion with explicit exclusions
 - Denied-file patterns
-- 27 unit tests and GitHub CI on Python 3.11 and 3.12
+- 38 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented:
 

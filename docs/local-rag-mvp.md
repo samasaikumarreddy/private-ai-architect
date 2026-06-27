@@ -1,17 +1,17 @@
 # Local RAG MVP
 
-Status: v0.2 implementation.
+Status: v0.2.0 released; v0.2.1 quality improvements in development.
 
 The local RAG MVP adds optional model-generated answers to the existing local
-retrieval flow. It intentionally uses the existing lexical JSON index so the
-grounding and fallback contract can be proven without adding cloud services,
-automatic model downloads, Docker deployment, or production infrastructure.
+retrieval flow. It uses a local JSON index with BM25 scoring so the grounding
+and fallback contract can be proven without adding cloud services, automatic
+model downloads, Docker deployment, or production infrastructure.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    USER["private-ai chat"] --> SEARCH["Local lexical retrieval"]
+    USER["private-ai chat"] --> SEARCH["Local BM25 retrieval"]
     SEARCH --> EVIDENCE{"Meaningful evidence?"}
     EVIDENCE -->|No| REFUSE["Local refusal"]
     EVIDENCE -->|Yes, no model requested| EXCERPTS["Cited source excerpts"]
@@ -47,22 +47,24 @@ Optional flags:
 ## Grounding Flow
 
 1. Load the existing local index.
-2. Score chunks using meaningful lexical query terms; common and
-   low-information words do not affect ranking.
-3. Remove common and low-information query words from the evidence decision.
+2. Score chunks with BM25; common and low-information words do not affect
+   ranking.
+3. Remove results scoring below 65 percent of the strongest result.
+4. Remove common and low-information query words from the evidence decision.
    Generic words such as `present`, `show`, and `tell` cannot establish support.
-4. Refuse without invoking Ollama when no meaningful query term matches.
-5. Query local Ollama `/api/tags`.
-6. Continue only if the requested model is already installed.
-7. For indexed Markdown, select query-matching sections from each retrieved
+5. Refuse without invoking Ollama when meaningful-term coverage is too low.
+6. Query local Ollama `/api/tags`.
+7. Continue only if the requested model is already installed.
+8. For indexed Markdown, select query-matching sections from each retrieved
    chunk so unrelated sections are not placed in the model context.
-8. Send a system instruction, the question, and those numbered source sections
+9. Send a system instruction, the question, and those numbered source sections
    to `/api/chat` with streaming disabled.
-9. Instruct the model to use only supplied sources and return a fixed refusal
+10. Instruct the model to use only supplied sources and return a fixed refusal
    token if support is insufficient.
-10. Reject generated answers containing uncited lines or citation numbers
-    outside the retrieved source range.
-11. Append source paths and chunk numbers from retrieval to the final output.
+11. Reject generated answers containing uncited lines or citation numbers
+   outside the retrieved source range.
+12. Reject claims without enough lexical overlap with their cited source.
+13. Append source paths and chunk numbers from retrieval to the final output.
 
 The client never calls `/api/pull`.
 
@@ -114,7 +116,7 @@ configuration, such as a non-loopback Ollama URL, returns a CLI usage error.
 
 ## Tests
 
-The v0.2 tests cover:
+The v0.2.1 tests cover:
 
 - Installed-model preflight before chat
 - No automatic model download
@@ -126,6 +128,10 @@ The v0.2 tests cover:
 - Denied-file exclusion
 - Existing dry-run and validation behavior
 - Existing retrieval-only chat behavior
+- BM25 ranking and v0.2 index compatibility
+- Claim-to-cited-source support validation
+- Bounded source-code ingestion and exclusions
+- Repeatable retrieval evaluation
 
 ## Verified Local Smoke Test
 
@@ -144,7 +150,7 @@ model and machine.
 
 ## Limitations
 
-- Lexical retrieval is not semantic retrieval.
+- BM25 retrieval is lexical, not semantic retrieval.
 - A matching term does not prove that retrieved evidence fully answers a
   question.
 - Prompt grounding reduces hallucination risk but cannot eliminate it.
