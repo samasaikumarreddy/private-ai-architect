@@ -64,7 +64,7 @@ Optional flags:
 11. Reject generated answers containing uncited lines or citation numbers
    outside the retrieved source range.
 12. Reject claims without enough lexical overlap with their cited source.
-13. Append source paths and chunk numbers from retrieval to the final output.
+13. Append only cited source paths and chunk numbers to the final output.
 
 The client never calls `/api/pull`.
 

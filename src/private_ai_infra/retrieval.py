@@ -11,6 +11,7 @@ BM25_K1 = 1.5
 BM25_B = 0.75
 RELATIVE_SCORE_FLOOR = 0.65
 MIN_EVIDENCE_COVERAGE = 0.34
+_CITATION_PATTERN = re.compile(r"\[(\d+)\]")
 STOP_WORDS = {
     "a",
     "an",
@@ -159,7 +160,15 @@ def format_grounded_answer(
         "",
         "Sources:",
     ]
-    for index, match in enumerate(matches, start=1):
+    cited_numbers = sorted(
+        {
+            int(value)
+            for value in _CITATION_PATTERN.findall(answer)
+            if 1 <= int(value) <= len(matches)
+        }
+    )
+    for index in cited_numbers:
+        match = matches[index - 1]
         source = match["source_path"]
         chunk_index = match["chunk_index"]
         score = _format_score(match["score"])

@@ -103,6 +103,16 @@ New indexes use schema version 2 and store term frequencies and token counts.
 When v0.2 metadata is absent, the retriever calculates those values from the
 stored chunk text at query time.
 
+## Verified Android Project Smoke Test
+
+On 2026-06-27, a reviewed Android application source tree and README were
+indexed with a 1 MiB file limit:
+
+- 193 files and 1,796 chunks were indexed.
+- One oversized JSON dataset and unsupported WebP assets were skipped.
+- A component question returned a grounded GenreDetector and EQManager answer.
+- The included retrieval evaluation passed 4/4.
+
 ## Known Limitations
 
 - BM25 is lexical and does not understand synonyms like an embedding model.

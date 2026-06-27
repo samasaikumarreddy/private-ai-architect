@@ -122,7 +122,7 @@ Implemented:
 - Claim-to-cited-source lexical support validation
 - Bounded source-code ingestion with explicit exclusions
 - Denied-file patterns
-- 38 unit tests and GitHub CI on Python 3.11 and 3.12
+- 39 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented:
 

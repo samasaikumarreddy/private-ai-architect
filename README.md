@@ -136,7 +136,7 @@ Current implementation:
 - Verified `llama3.2:1b` smoke test on an RTX 3060 Laptop GPU
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
-- 38 unit tests and GitHub CI on Python 3.11 and 3.12
+- 39 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented yet:
 

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from private_ai_infra.indexer import build_index
-from private_ai_infra.retrieval import format_retrieval_answer, search_index
+from private_ai_infra.retrieval import format_grounded_answer, format_retrieval_answer, search_index
 
 
 class IndexerRetrievalTests(unittest.TestCase):
@@ -156,6 +156,20 @@ class IndexerRetrievalTests(unittest.TestCase):
             matches = search_index(index_path, "remote work approval")
 
             self.assertEqual(matches[0]["source_name"], "policy.md")
+
+    def test_grounded_answer_lists_only_cited_retrieved_sources(self):
+        answer = format_grounded_answer(
+            "Which component applies EQ?",
+            "- EQManager applies the EQ profile. [1]",
+            [
+                {"source_path": "README.md", "chunk_index": 0, "score": 5},
+                {"source_path": "Unrelated.kt", "chunk_index": 2, "score": 4},
+            ],
+            model="test-model",
+        )
+
+        self.assertIn("[1] README.md#chunk-0", answer)
+        self.assertNotIn("Unrelated.kt", answer)
 
     def test_index_file_count_limit_stops_traversal(self):
         with tempfile.TemporaryDirectory() as tmp:
