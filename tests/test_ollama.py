@@ -96,6 +96,30 @@ class OllamaClientTests(unittest.TestCase):
 
         self.assertEqual(answer, "- Supported statement. [1]")
 
+    def test_claim_cited_to_unrelated_source_is_rejected(self):
+        def fake_request(url, method, payload, timeout):
+            if url.endswith("/api/tags"):
+                return {"models": [{"name": "test-model:latest"}]}
+            return {
+                "message": {
+                    "role": "assistant",
+                    "content": "- NotificationListenerService detects songs with AudioEffect. [1]",
+                }
+            }
+
+        with self.assertRaisesRegex(OllamaUnavailable, "not supported by its cited source"):
+            OllamaClient(request_json=fake_request).generate_grounded_answer(
+                "Which components detect songs?",
+                [
+                    {
+                        "source_path": "governance.md",
+                        "chunk_index": 0,
+                        "text": "Architecture reviews require an owner and approval.",
+                    }
+                ],
+                model="test-model",
+            )
+
     def test_missing_model_stops_before_chat_and_never_downloads(self):
         calls = []
 
