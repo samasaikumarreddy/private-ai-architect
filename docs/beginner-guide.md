@@ -1,13 +1,14 @@
 # Beginner's Guide
 
-This guide explains Private AI Infrastructure Blueprint without assuming that
+This guide explains Private AI Architect without assuming that
 you already understand AI infrastructure, migration, RAG, vector databases, or
 GPU servers.
 
 > **Project status:** Basic dry-run planning, validation, machine checks,
-> document indexing, and cited document search work today. The complete guided
-> questionnaire, normalized blueprint, model-generated answers, hardware
-> deployment, cloud discovery, and migration automation are planned.
+> document indexing, cited document search, and optional local
+> Ollama-generated answers work in v0.2. The complete guided questionnaire,
+> normalized blueprint, hardware deployment, cloud discovery, and migration
+> automation are planned.
 
 ## The Project In One Minute
 
@@ -27,9 +28,10 @@ This project is building a guided architect that makes the path safer:
 8. For migrations, verify the target and preserve a rollback path before
    production traffic changes.
 
-The current release provides the first planning and local search foundations.
-The working local RAG reference comes next, followed by private hardware and
-cloud migration workflows.
+The current release provides the first working local RAG loop: retrieve
+approved local context, optionally ask an installed local model to answer,
+validate citations, and refuse unsupported questions. Private hardware and
+cloud migration workflows come later.
 
 ## Three Ways To Use The Project
 
@@ -83,7 +85,13 @@ flowchart LR
     CLI --> INDEX["Index approved local files"]
     PLAN --> VALIDATE["Validate configuration safety"]
     INDEX --> SEARCH["Search document chunks"]
-    SEARCH --> RESULT["Return cited excerpts"]
+    SEARCH --> EVIDENCE{"Evidence found?"}
+    EVIDENCE -->|No| REFUSE["Refuse without calling a model"]
+    EVIDENCE -->|Yes, no model| RESULT["Return cited excerpts"]
+    EVIDENCE -->|Yes, --model| MODEL["Local Ollama"]
+    MODEL --> CITATIONS{"Citations valid?"}
+    CITATIONS -->|Yes| ANSWER["Return grounded answer"]
+    CITATIONS -->|No| RESULT
 ```
 
 It can:
@@ -94,13 +102,22 @@ It can:
 - Index approved Markdown, text, log, YAML, and JSON files.
 - Skip likely secret, credential, key, token, and `.env` files.
 - Find relevant excerpts and show where they came from.
+- Optionally ask an already-installed local Ollama model to answer from the
+  retrieved context.
+- Refuse unsupported questions before invoking the model.
+- Reject missing or unknown model citations and return cited retrieval results
+  instead.
 
-It does **not** currently ask an LLM to write an answer. The `chat` command is a
-retrieval preview, so its output is source text rather than generated text.
+By default, `private-ai chat` returns retrieval-only cited excerpts and does not
+invoke a model. If the user explicitly passes `--model` with an
+already-installed local Ollama model, the command can generate an answer using
+retrieved context.
 
-## The First Planned Runtime: Local RAG
+## Working v0.2 And The Full Planned Runtime
 
-This is the full workflow the project is working toward:
+v0.2 proves the local retrieval, model, citation, fallback, and refusal path
+with a lexical JSON index. This is the fuller runtime architecture the project
+is working toward:
 
 ```mermaid
 flowchart TD
@@ -123,9 +140,11 @@ flowchart TD
 The central rule is simple: a model must receive only information that the
 current user is allowed to access.
 
-The RAG runtime is the first reference target, not the entire product. Once it
-works reliably, the same blueprint and validation engine can generate and
-verify private hardware and migration configurations.
+The v0.2 RAG runtime is the first working reference, not the entire product.
+Authentication, runtime RBAC, semantic vector retrieval, audit storage, and
+production deployment remain future work. Once those local foundations are
+reliable, the blueprint and validation engine can expand to private hardware
+and migration configurations.
 
 ## Where The System Runs
 
@@ -150,8 +169,8 @@ flowchart LR
 | Hybrid gateway | Cloud-integrated remote access with explicit data-transit rules. |
 
 Expensive hardware is not required to start. A normal computer can run the
-dry-run and retrieval preview. Model speed and model size determine when a GPU
-becomes useful.
+dry-run, retrieval-only chat, and a sufficiently small local model. Model speed
+and model size determine when a GPU becomes useful.
 
 ## Security Boundaries
 
@@ -218,7 +237,8 @@ private-ai doctor
 ```
 
 A warning about Ollama is expected if it is not installed. Ollama is not needed
-for the current retrieval-only preview.
+for dry-run planning or retrieval-only search. It is needed only when the user
+explicitly passes `--model` for a local generated answer.
 
 ### 3. Generate A Safe Plan
 
@@ -240,14 +260,49 @@ private-ai ingest examples/sample-company-docs --collection docs --output-dir ge
 Only use the included sample files or other data you are authorized to process.
 Never test with real credentials or confidential company data.
 
-### 5. Search The Documents
+### 5. Search Without A Model
 
 ```bash
 private-ai chat "What are the AI usage rules?" --index generated/index/index.json
 ```
 
-The command returns relevant excerpts and their source paths. This demonstrates
-the retrieval and citation foundation that a local LLM will use later.
+This default command returns relevant excerpts and their source paths. It does
+not invoke a model.
+
+### 6. Optionally Generate A Local Answer
+
+Install Ollama separately. Confirm which models are already installed:
+
+```bash
+ollama list
+```
+
+For the documented small-model example, the operator can explicitly run:
+
+```bash
+ollama pull llama3.2:1b
+```
+
+`private-ai` never downloads a model automatically. After the model is
+installed, request a local answer:
+
+```bash
+private-ai chat "What are the AI usage rules?" --index generated/index/index.json --model llama3.2:1b
+```
+
+The command sends retrieved context only to the loopback Ollama API. A valid
+answer includes numbered citations and a matching `Sources` section. If Ollama
+is unavailable or citations are invalid, the command safely returns
+retrieval-only excerpts.
+
+### 7. Verify Unsupported-Question Refusal
+
+```bash
+private-ai chat "What minerals are present on the moon?" --index generated/index/index.json --model llama3.2:1b
+```
+
+Because the approved sample documents do not support that question, the
+command refuses before invoking Ollama.
 
 ## Current And Future Capabilities
 
@@ -260,7 +315,9 @@ the retrieval and citation foundation that a local LLM will use later.
 | Retrieval with source citations | Working |
 | Complete branching questionnaire | Planned |
 | Normalized versioned blueprint | Planned |
-| Local LLM-generated answers | Planned |
+| Optional local Ollama-generated answers | Working in v0.2 |
+| Unsupported-question refusal before model invocation | Working in v0.2 |
+| Invalid or missing model-citation fallback | Working in v0.2 |
 | Semantic embedding and vector database | Planned |
 | Web chat and administration interface | Planned |
 | Login, SSO, and production RBAC enforcement | Planned |
@@ -272,14 +329,14 @@ the retrieval and citation foundation that a local LLM will use later.
 
 ## What We Will Build Next
 
-The next useful milestone is a complete local RAG loop:
+The basic local RAG loop now works. The next local priorities are:
 
-1. Connect a local model through Ollama.
+1. Improve retrieval quality and evaluation.
 2. Add local embeddings and a vector database.
-3. Generate answers using only retrieved context.
-4. Include citations with every answer.
-5. Add automated checks for unsupported or ungrounded answers.
-6. Package the services with Docker Compose.
+3. Add stronger checks for unsupported or ungrounded claims.
+4. Add source-code-aware ingestion with strict exclusions.
+5. Add runtime authentication, RBAC, and audit storage.
+6. Package a later service stack only after its safety contract is tested.
 
 After that foundation is reliable, the project can add a web interface,
 authentication, stronger RBAC, a branching blueprint workflow, GPU server
@@ -296,16 +353,19 @@ benchmarks. See
 
 ### Does this send my files to an external AI service?
 
-The current ingestion and search commands operate locally. The intended default
-architecture also keeps documents, embeddings, prompts, and model inference in
-the approved environment. Future cloud-relayed gateways may carry prompts and
-responses through cloud infrastructure, so transit and logging must be explicit
-rather than described as fully on-premises.
+The current ingestion and retrieval commands operate locally. Optional v0.2
+generation accepts only a loopback Ollama URL and rejects known Ollama cloud
+model names. `private-ai` does not upload files or download models. Future
+cloud-relayed gateways may carry prompts and responses through cloud
+infrastructure, so transit and logging must be explicit rather than described
+as fully on-premises.
 
 ### Is it production-ready?
 
-No. It is an early implementation with working planning and retrieval tools.
-Do not use it as a production security boundary yet.
+No. It is an early implementation with working planning, retrieval, and
+optional local model answers. It does not yet provide production
+authentication, RBAC, semantic retrieval, audit storage, or deployment
+automation. Do not use it as a production security boundary.
 
 ### Do I need a DGX system?
 

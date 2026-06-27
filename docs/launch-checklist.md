@@ -4,9 +4,13 @@ This checklist defines what should exist before promoting the repository widely.
 
 ## Current Stage
 
-Current stage: v0.1 safe planning foundation and retrieval preview.
+Current stage: v0.2 local RAG implemented and merge-verified.
 
-The project is not ready for a broad local RAG launch yet because ingestion, model inference, Docker images, and the UI are not implemented. It is ready to be shared as an early blueprint with a working dry-run CLI if the messaging is honest.
+The project has safe local ingestion, retrieval, optional Ollama-generated
+cited answers, citation validation, unsupported-question refusal, a real local
+model smoke test, and green Python 3.11/3.12 CI. It is not a production
+platform: semantic retrieval, Docker services, runtime RBAC, audit storage,
+and the UI remain unimplemented.
 
 ## Pre-GitHub Checklist
 
@@ -46,9 +50,9 @@ The project is not ready for a broad local RAG launch yet because ingestion, mod
 - [x] Makefile for common local commands
 - [x] Git repository initialized
 - [x] Baseline commits created
-- [ ] GitHub repository created
-- [ ] Repository description set
-- [ ] Repository topics set
+- [x] GitHub repository created
+- [x] Repository description set
+- [x] Repository topics set
 - [ ] Private vulnerability reporting enabled
 
 ## Before First Public Push
@@ -97,9 +101,10 @@ blueprint, and is designed to support:
 - new GPU and DGX Spark integration
 - staged Azure OpenAI and AWS Bedrock migration
 
-The current release has safe dry-run generation and a retrieval preview. The
-next milestone is a working local RAG reference with cited answers. Cloud
-discovery and production migration are later, separately tested stages.
+The current release has safe dry-run generation and working local RAG with
+cited Ollama answers, citation validation, retrieval fallback, and refusal.
+Semantic retrieval quality is the next local priority. Cloud discovery and
+production migration are later, separately tested stages.
 
 Repo: <link>
 ```
@@ -140,8 +145,8 @@ Repo: <link>
 
 The biggest risk is overclaiming. The project should be explicit:
 
-- Dry-run and retrieval preview now
-- Working local RAG next
+- Dry-run planning and working local RAG now
+- Better local retrieval evaluation next
 - Guided blueprint and verified hardware profiles after that
 - Narrow provider discovery and migration later
 

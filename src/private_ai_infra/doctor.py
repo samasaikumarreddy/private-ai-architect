@@ -6,6 +6,8 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 
+from .ollama import OllamaClient, OllamaError
+
 
 @dataclass(frozen=True)
 class DoctorReport:
@@ -33,13 +35,26 @@ def run_doctor() -> DoctorReport:
     checks.append(f"OS: {platform.system()} {platform.release()}")
     checks.append(f"Machine: {platform.machine()}")
 
-    for command in ("git", "docker", "ollama", "nvidia-smi"):
+    for command in ("git", "docker", "nvidia-smi"):
         path = shutil.which(command)
         if path:
             version = _command_version(command)
             checks.append(f"{command}: found at {path}{version}")
         else:
             warnings.append(f"{command}: not found")
+
+    ollama_path = shutil.which("ollama")
+    if ollama_path:
+        checks.append(f"ollama: found at {ollama_path}{_command_version('ollama')}")
+    else:
+        try:
+            installed_models = OllamaClient(timeout=1.0).list_installed_models()
+            checks.append(
+                "ollama: local API available at http://127.0.0.1:11434 "
+                f"({len(installed_models)} installed model name(s))"
+            )
+        except OllamaError:
+            warnings.append("ollama: executable not found and local API unavailable")
 
     if shutil.which("docker") is None:
         warnings.append("Docker is needed for the planned local RAG MVP stack.")
@@ -70,4 +85,3 @@ def _command_version(command: str) -> str:
     if not output:
         return ""
     return f" ({output[0]})"
-

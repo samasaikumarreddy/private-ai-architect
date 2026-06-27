@@ -1,16 +1,26 @@
-# Private AI Infrastructure Blueprint
+# Private AI Architect
 
-Status: early open-source guided architect with a working dry-run CLI and
-retrieval preview. The local RAG runtime, hardware deployment, and cloud
-migration paths are not implemented yet.
+[![CI](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml/badge.svg)](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/samasaikumarreddy/private-ai-architect)](LICENSE)
+
+Status: v0.2 local RAG is implemented. The CLI safely indexes approved local
+documents, returns retrieval citations, optionally generates answers with an
+installed loopback Ollama model, validates citation numbers, and refuses
+unsupported questions. The release has 27 automated tests and a documented
+RTX 3060 Laptop GPU smoke test.
+
+Semantic vector retrieval, source-code ingestion, hardware deployment, and
+cloud migration are not implemented yet.
 
 Plan, generate, validate, and eventually migrate private AI systems across
 developer machines, GPU servers, DGX Spark, and hybrid cloud environments.
 
-Private AI Infrastructure Blueprint is an open-source guided architect. It asks
-workflow-specific questions, records unknown decisions instead of guessing,
-builds a normalized blueprint, generates proposed configuration and migration
-artifacts, validates known risks, and produces evidence for human review.
+Private AI Architect is an open-source, security-first path from useful local
+RAG to guided private AI infrastructure. Today it provides a safe local RAG
+CLI and dry-run planning foundation. The longer-term product will ask
+workflow-specific questions, record unknown decisions instead of guessing,
+build a normalized blueprint, and generate reviewable configuration and
+migration artifacts.
 
 The product supports three journeys:
 
@@ -28,6 +38,10 @@ applying infrastructure changes.
 **New to private AI?** Start with the [Beginner's Guide](docs/beginner-guide.md).
 It uses simple explanations and diagrams to show what works today and what the
 project will build next.
+
+**Ready to run it?** Follow [QUICKSTART.md](QUICKSTART.md) using the included
+synthetic documents, or use the copy-and-paste
+[Version Test Guide](docs/version-test-guide.md).
 
 ## Why Star This Project
 
@@ -60,7 +74,8 @@ This should become a practical open-source starting point, not a vendor-locked d
 
 ## Who This Is For
 
-- Developers building local AI assistants over approved docs or code.
+- Developers building local AI assistants over approved documents today, with
+  source-code ingestion planned for a later version.
 - Teams adding RAG to internal knowledge bases.
 - Startups and small companies that need private document search.
 - Security teams reviewing AI before company rollout.
@@ -107,16 +122,23 @@ Current implementation:
 - `private-ai modes`
 - `private-ai ingest` for local JSON indexing
 - `private-ai chat` for retrieval-only cited excerpts
+- Optional `private-ai chat --model <installed-model>` for local
+  Ollama-generated answers with retrieval citations
+- Evidence-based refusal and graceful retrieval fallback
+- Citation-range validation that rejects missing or invented source numbers
+- Query-focused Markdown sections to reduce unrelated model context
+- Loopback-only Ollama access with installed-model preflight
+- Verified `llama3.2:1b` smoke test on an RTX 3060 Laptop GPU
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
-- Unit tests
+- 27 unit tests and GitHub CI on Python 3.11 and 3.12
 
 Not implemented yet:
 
 - Normalized blueprint and complete branching questionnaire
 - Real Docker images
 - Vector database writes
-- Model inference
+- Semantic embeddings and vector retrieval
 - Web UI
 - Cloud provider discovery
 - Hardware-verified DGX Spark profile
@@ -161,7 +183,21 @@ private-ai ingest examples/sample-company-docs --collection docs --output-dir ge
 private-ai chat "what are the AI usage rules?" --index generated/index/index.json
 ```
 
-This returns cited source excerpts from a local JSON index. It does not call an LLM yet.
+This invocation returns cited source excerpts from a local JSON index without
+calling a model.
+
+Optionally use an already-installed local Ollama model:
+
+```bash
+ollama pull llama3.2:1b
+private-ai chat "what are the AI usage rules?" --index generated/index/index.json --model llama3.2:1b
+```
+
+The model download occurs only because the operator explicitly runs
+`ollama pull`. The `private-ai` command verifies the model is installed and
+never downloads one. If local Ollama is unavailable or generated citations
+are invalid, it returns the retrieval-only result with a warning. Only
+loopback Ollama URLs are accepted in v0.2.
 
 Run tests:
 
@@ -186,38 +222,42 @@ Dry-run output is written under `generated/dry-run/` and is intentionally ignore
 - No compliance certification claims
 - Verification and rollback before production cutover
 
-## MVP Target
+## Current v0.2 Flow
 
-The first implementation should stay narrow:
+The implemented local flow stays narrow:
 
 ```text
 User
-  -> Web UI or CLI
-  -> Auth and role check
-  -> FastAPI backend
-  -> RAG pipeline
-  -> Vector database
-  -> Local LLM runtime
-  -> Answer with citations
+  -> private-ai CLI
+  -> approved local documents
+  -> denied-file filtering
+  -> local lexical JSON index
+  -> evidence check
+  -> retrieval-only excerpts or local Ollama
+  -> citation validation
+  -> cited answer, safe fallback, or refusal
 ```
 
-MVP capabilities:
+Implemented v0.2 capabilities:
 
-- Local developer question branch
 - Dry-run mode that generates plans but applies nothing
-- Docker Compose local deployment
 - Local document ingestion from approved paths
 - RAG Q&A with citations
 - Refusal when evidence is missing
-- Basic collection permissions
-- Redacted local audit events
-- Automated CPU and documented RTX smoke tests
+- Retrieval fallback when Ollama or its response is unavailable
+- Rejection of missing or out-of-range generated citations
+- Localhost-only model access
+- Automated tests and a documented RTX smoke test
 
-Cloud discovery, DGX Spark verification, hybrid gateways, and production
-cutover are later milestones. See the [Roadmap](docs/roadmap.md).
+Semantic embeddings, vector storage, runtime RBAC, audit storage, web UI,
+source-code ingestion, cloud discovery, DGX Spark verification, hybrid
+gateways, and production cutover are later milestones. See the
+[Roadmap](docs/roadmap.md).
 
 ## Documentation Map
 
+- [Quickstart](QUICKSTART.md)
+- [Version Test Guide](docs/version-test-guide.md)
 - [Beginner's Guide](docs/beginner-guide.md)
 - [Vision](docs/vision.md)
 - [Guided Architect Workflow](docs/guided-architect-workflow.md)
@@ -228,6 +268,7 @@ cutover are later milestones. See the [Roadmap](docs/roadmap.md).
 - [Developer Workflow](docs/developer-workflow.md)
 - [Project Investigation](docs/project-investigation.md)
 - [Architecture](docs/architecture.md)
+- [Local RAG MVP](docs/local-rag-mvp.md)
 - [Knowledge Workspace And Memory Optimization](docs/knowledge-workspace-and-memory-optimization.md)
 - [Deployment Modes](docs/deployment-modes.md)
 - [Hardware And Runtime Options](docs/hardware-and-runtime-options.md)
@@ -254,7 +295,7 @@ private-ai ingest
 private-ai chat
 ```
 
-Planned but intentionally blocked in v0.1:
+Planned but intentionally blocked:
 
 ```bash
 private-ai apply

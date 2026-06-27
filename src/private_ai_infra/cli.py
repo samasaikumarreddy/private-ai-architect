@@ -9,11 +9,20 @@ from .doctor import run_doctor
 from .generator import generate_dry_run
 from .indexer import build_index
 from .models import DEPLOYMENT_PROFILES, default_answers, normalize_mode
-from .retrieval import format_retrieval_answer, search_index
+from .ollama import DEFAULT_OLLAMA_URL, OllamaClient, OllamaError, is_refusal
+from .retrieval import (
+    format_grounded_answer,
+    format_insufficient_evidence_refusal,
+    format_retrieval_answer,
+    has_sufficient_evidence,
+    search_index,
+)
 from .validator import validate_dry_run
 
 
 def main(argv: list[str] | None = None) -> int:
+    _configure_output_stream(sys.stdout)
+    _configure_output_stream(sys.stderr)
     parser = build_parser()
     args = parser.parse_args(argv)
     if not hasattr(args, "handler"):
@@ -27,6 +36,16 @@ def main(argv: list[str] | None = None) -> int:
     except FileExistsError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
+
+
+def _configure_output_stream(stream: object) -> None:
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors="replace")
+    except (OSError, ValueError):
+        pass
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -88,10 +107,28 @@ def build_parser() -> argparse.ArgumentParser:
     ingest_parser.add_argument("--force", action="store_true", help="Overwrite an existing local index.")
     ingest_parser.set_defaults(handler=handle_ingest)
 
-    chat_parser = subparsers.add_parser("chat", help="Run retrieval-only query over a local index.")
+    chat_parser = subparsers.add_parser(
+        "chat",
+        help="Query a local index with retrieval-only output or an optional installed Ollama model.",
+    )
     chat_parser.add_argument("query", nargs="?", help="Question or search query.")
     chat_parser.add_argument("--index", default="generated/index/index.json", help="Path to local JSON index.")
     chat_parser.add_argument("--top-k", type=int, default=3, help="Number of cited excerpts to return.")
+    chat_parser.add_argument(
+        "--model",
+        help="Use this already-installed local Ollama model. Models are never downloaded automatically.",
+    )
+    chat_parser.add_argument(
+        "--ollama-url",
+        default=DEFAULT_OLLAMA_URL,
+        help="Local loopback Ollama URL. Non-loopback addresses are rejected in v0.2.",
+    )
+    chat_parser.add_argument(
+        "--ollama-timeout",
+        type=float,
+        default=60.0,
+        help="Local Ollama request timeout in seconds.",
+    )
     chat_parser.set_defaults(handler=handle_chat)
 
     for command in ("apply", "audit"):
@@ -103,7 +140,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def handle_init(args: argparse.Namespace) -> int:
     if not args.dry_run:
-        print("Only dry-run init is implemented in v0.1. Use: private-ai init --dry-run")
+        print("Only dry-run init is implemented. Use: private-ai init --dry-run")
         return 2
 
     answers = _prompt_for_answers(args) if args.interactive else _answers_from_args(args)
@@ -145,14 +182,40 @@ def handle_ingest(args: argparse.Namespace) -> int:
 
 def handle_chat(args: argparse.Namespace) -> int:
     if not args.query:
-        print("error: query is required for retrieval-only chat", file=sys.stderr)
+        print("error: query is required for chat", file=sys.stderr)
+        return 2
+    if not 1 <= args.top_k <= 10:
+        print("error: --top-k must be between 1 and 10", file=sys.stderr)
         return 2
     index_path = Path(args.index)
     if not index_path.exists():
         print(f"error: index does not exist: {index_path}. Run private-ai ingest first.", file=sys.stderr)
         return 2
     matches = search_index(index_path, args.query, top_k=args.top_k)
-    print(format_retrieval_answer(args.query, matches))
+    if not args.model:
+        print(format_retrieval_answer(args.query, matches))
+        return 0
+
+    if not has_sufficient_evidence(args.query, matches):
+        print(format_insufficient_evidence_refusal(args.query))
+        return 0
+
+    try:
+        answer = OllamaClient(
+            base_url=args.ollama_url,
+            timeout=args.ollama_timeout,
+        ).generate_grounded_answer(args.query, matches, model=args.model)
+    except OllamaError as exc:
+        print(f"warning: {exc}", file=sys.stderr)
+        print("warning: using retrieval-only fallback; no model answer was generated.", file=sys.stderr)
+        print(format_retrieval_answer(args.query, matches))
+        return 0
+
+    if is_refusal(answer):
+        print(format_insufficient_evidence_refusal(args.query))
+        return 0
+
+    print(format_grounded_answer(args.query, answer, matches, model=args.model))
     return 0
 
 
@@ -168,7 +231,8 @@ def handle_modes(args: argparse.Namespace) -> int:
 def handle_not_implemented(args: argparse.Namespace) -> int:
     print(
         f"`private-ai {args.command}` is intentionally not implemented yet. "
-        "The project currently supports dry-run planning, validation, and retrieval-only local preview."
+        "The project currently supports dry-run planning, validation, local retrieval, "
+        "and optional local Ollama-backed chat."
     )
     return 2
 

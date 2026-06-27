@@ -1,6 +1,8 @@
 # CLI Reference
 
-The CLI is the first working implementation milestone. It currently supports dry-run planning, validation, and local readiness inspection.
+The CLI supports dry-run planning, validation, local readiness inspection,
+safe local indexing, retrieval-only citations, and optional local
+Ollama-backed answers.
 
 ## Install For Local Development
 
@@ -36,7 +38,9 @@ private-ai apply
 private-ai audit
 ```
 
-Those commands return a non-zero exit code in v0.1 because production-impacting behavior should not exist until validation and runtime code are ready.
+Those commands return a non-zero exit code because production-impacting
+behavior should not exist until validation, approval, and runtime code are
+ready.
 
 The longer-term guided lifecycle also includes provider-specific discovery,
 blueprint generation, verification, evidence export, shadowing, cutover, and
@@ -110,7 +114,7 @@ The doctor command reports local readiness signals:
 
 Missing Docker, Ollama, or NVIDIA tooling is reported as a warning, not an immediate failure. CPU-only local planning is still valid.
 
-## Retrieval-Only Local Preview
+## Local Retrieval And Optional Ollama
 
 Build a local JSON index:
 
@@ -124,9 +128,38 @@ Ask a retrieval-only question:
 private-ai chat "what are the AI usage rules?" --index generated/index/index.json
 ```
 
-This returns cited source excerpts from the local index. It does not call an LLM, write to a vector database, or generate a model answer in v0.1.
+This returns cited source excerpts from the local index. Without `--model`, it
+does not call an LLM, write to a vector database, or generate a model answer.
 
 Ingestion skips denied secret patterns such as `.env`, private keys, credentials files, and token-like file names.
+
+To request a local model-generated answer, pass a model that is already
+installed in Ollama:
+
+```bash
+private-ai chat "what are the AI usage rules?" --index generated/index/index.json --model <installed-model>
+```
+
+Additional options:
+
+```text
+--ollama-url http://127.0.0.1:11434
+--ollama-timeout 60
+--top-k 3
+```
+
+The v0.2 client:
+
+- Accepts only loopback Ollama URLs.
+- Checks the installed-model list before generation.
+- Never downloads a model.
+- Refuses without model invocation when retrieval evidence is absent.
+- Sends only retrieved chunks as context.
+- Appends citations from retrieval.
+- Falls back to retrieval-only output when Ollama is unavailable.
+
+The index remains a lexical JSON index in v0.2. Vector database writes and
+semantic embeddings are not implemented.
 
 ## List Modes
 

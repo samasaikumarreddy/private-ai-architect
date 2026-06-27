@@ -33,25 +33,36 @@ Current limitations:
 
 Goal: prove the smallest useful private-AI deployment end to end.
 
-Deliverables:
+Status: implemented.
 
-- Docker Compose reference stack
-- Private API
-- Ollama integration
-- Qdrant integration
-- Approved-folder ingestion
+Delivered:
+
+- Approved local document ingestion with denied-file rules
+- Retrieval-only cited excerpts
+- Optional loopback Ollama integration
+- Installed-model preflight without automatic downloads
 - Model-generated answers with citations
-- Refusal when evidence is missing
-- Local audit events
-- Automated smoke and grounding tests
+- Citation-range validation and retrieval fallback
+- Refusal before model invocation when evidence is missing
+- Query-focused Markdown context
+- Automated grounding tests
+- Documented `llama3.2:1b` RTX smoke test
 
-Exit criteria:
+Exit criteria achieved:
 
 - A developer can clone the project and receive a cited answer from sample
   documents without cloud inference.
-- Services bind to localhost by default.
+- Ollama access is restricted to loopback addresses.
 - Denied files remain excluded.
-- The same flow works on CPU and a documented supported RTX configuration.
+- The flow does not require a GPU and has a documented RTX configuration.
+
+Deferred beyond v0.2:
+
+- Docker Compose runtime stack
+- Private API and web UI
+- Qdrant and semantic embeddings
+- Runtime RBAC and audit storage
+- Source-code-aware ingestion
 
 ## v0.3: Guided Architect Core
 
