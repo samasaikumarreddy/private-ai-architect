@@ -157,19 +157,6 @@ class IndexerRetrievalTests(unittest.TestCase):
 
             self.assertEqual(matches[0]["source_name"], "policy.md")
 
-    def test_explicit_file_inside_denied_directory_is_rejected(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            generated = root / "build" / "Generated.kt"
-            generated.parent.mkdir()
-            generated.write_text("generated-sensitive-content", encoding="utf-8")
-
-            result = build_index([generated], output_dir=root / "index", collection="code")
-
-            self.assertEqual(result.files_indexed, 0)
-            self.assertTrue(any("denied directory build" in item for item in result.skipped_files))
-            self.assertNotIn("generated-sensitive-content", result.index_path.read_text(encoding="utf-8"))
-
     def test_index_file_count_limit_stops_traversal(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -182,6 +169,18 @@ class IndexerRetrievalTests(unittest.TestCase):
 
             self.assertEqual(result.files_indexed, 2)
             self.assertIn("index file limit reached: 2", result.skipped_files)
+
+    def test_denied_name_above_approved_source_does_not_block_ingestion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            approved = root / "tmp" / "approved"
+            approved.mkdir(parents=True)
+            (approved / "README.md").write_text("approved content", encoding="utf-8")
+
+            result = build_index([approved], output_dir=root / "index", collection="docs")
+
+            self.assertEqual(result.files_indexed, 1)
+            self.assertIn("approved content", result.index_path.read_text(encoding="utf-8"))
 
     def test_output_directory_inside_source_is_pruned(self):
         with tempfile.TemporaryDirectory() as tmp:

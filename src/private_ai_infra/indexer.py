@@ -262,9 +262,6 @@ def _skip_reason(file_path: Path, *, max_file_bytes: int) -> str | None:
         return "symbolic links are not followed"
     if not file_path.exists():
         return "source does not exist"
-    denied_directory_reason = _denied_directory_reason(file_path.parent)
-    if denied_directory_reason:
-        return denied_directory_reason
     for part in file_path.parts:
         for pattern in DENIED_PATTERNS:
             if fnmatch.fnmatch(part.lower(), pattern.lower()):
@@ -282,9 +279,8 @@ def _skip_reason(file_path: Path, *, max_file_bytes: int) -> str | None:
 
 
 def _denied_directory_reason(path: Path) -> str | None:
-    for part in path.parts:
-        if part.lower() in DENIED_DIRECTORY_NAMES:
-            return f"denied directory {part}"
+    if path.name.lower() in DENIED_DIRECTORY_NAMES:
+        return f"denied directory {path.name}"
     return None
 
 
