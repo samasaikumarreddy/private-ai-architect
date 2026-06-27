@@ -13,6 +13,8 @@ from urllib.parse import urlparse
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 REFUSAL_TOKEN = "INSUFFICIENT_EVIDENCE"
 MAX_RESPONSE_BYTES = 4 * 1024 * 1024
+_CITATION_PATTERN = re.compile(r"\[(\d+)\]")
+_CITATION_ONLY_PATTERN = re.compile(r"(?:\[\d+\][.,]?\s*)+")
 
 JsonRequest = Callable[[str, str, dict[str, object] | None, float], dict[str, object]]
 
@@ -68,8 +70,11 @@ class OllamaClient:
                             "Do not infer, imply, combine, or invent requirements. "
                             "Ignore unrelated statements, even when they appear in a relevant source. "
                             "When at least one source explicitly answers the question, return only the "
-                            "supported facts as concise bullets and end every bullet with its source "
-                            "number, such as [1]. Do not include the refusal token with a supported answer. "
+                            "supported facts as concise bullets. Use '-' as the bullet marker; do not "
+                            "number the list. End every bullet with exactly one provided source citation, "
+                            "and never cite a source number that was not provided. Correct format: "
+                            "'- A fact explicitly stated in source one. [1]' "
+                            "Do not include the refusal token with a supported answer. "
                             "Do not use outside or remembered knowledge."
                         ),
                     },
@@ -89,7 +94,10 @@ class OllamaClient:
         content = message.get("content")
         if not isinstance(content, str) or not content.strip():
             raise OllamaUnavailable("Ollama returned an empty assistant response.")
-        return content.strip()
+        answer = _join_standalone_citations(content.strip())
+        if not is_refusal(answer):
+            _validate_grounded_citations(answer, source_count=len(matches))
+        return answer
 
     def _require_installed_model(self, model: str) -> None:
         installed = set(self.list_installed_models())
@@ -161,6 +169,35 @@ def validate_local_model_name(value: str) -> str:
 
 def is_refusal(answer: str) -> bool:
     return REFUSAL_TOKEN in answer.upper()
+
+
+def _join_standalone_citations(answer: str) -> str:
+    normalized: list[str] = []
+    for line in answer.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if normalized and _CITATION_ONLY_PATTERN.fullmatch(stripped):
+            normalized[-1] = f"{normalized[-1]} {stripped}"
+        else:
+            normalized.append(stripped)
+    return "\n".join(normalized)
+
+
+def _validate_grounded_citations(answer: str, *, source_count: int) -> None:
+    lines = [line.strip() for line in answer.splitlines() if line.strip()]
+    if not lines:
+        raise OllamaUnavailable("Ollama returned an empty assistant response.")
+
+    for line in lines:
+        citations = [int(value) for value in _CITATION_PATTERN.findall(line)]
+        if not citations:
+            raise OllamaUnavailable("Ollama returned a claim without a source citation.")
+        claim = _CITATION_PATTERN.sub("", line).strip(" -.,")
+        if not claim:
+            raise OllamaUnavailable("Ollama returned a citation without a claim.")
+        if any(citation < 1 or citation > source_count for citation in citations):
+            raise OllamaUnavailable("Ollama cited a source number that was not provided.")
 
 
 def _model_is_installed(requested: str, installed: set[str]) -> bool:

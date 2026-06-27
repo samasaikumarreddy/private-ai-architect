@@ -21,6 +21,8 @@ from .validator import validate_dry_run
 
 
 def main(argv: list[str] | None = None) -> int:
+    _configure_output_stream(sys.stdout)
+    _configure_output_stream(sys.stderr)
     parser = build_parser()
     args = parser.parse_args(argv)
     if not hasattr(args, "handler"):
@@ -34,6 +36,16 @@ def main(argv: list[str] | None = None) -> int:
     except FileExistsError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
+
+
+def _configure_output_stream(stream: object) -> None:
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors="replace")
+    except (OSError, ValueError):
+        pass
 
 
 def build_parser() -> argparse.ArgumentParser:

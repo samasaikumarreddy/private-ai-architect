@@ -1,15 +1,25 @@
 from contextlib import redirect_stderr, redirect_stdout
-from io import StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 import tempfile
 import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from private_ai_infra.cli import main
+from private_ai_infra.cli import _configure_output_stream, main
 from private_ai_infra.ollama import OllamaUnavailable
 
 
 class CliTests(unittest.TestCase):
+    def test_output_stream_replaces_unencodable_document_characters(self):
+        raw = BytesIO()
+        stream = TextIOWrapper(raw, encoding="ascii", errors="strict")
+
+        _configure_output_stream(stream)
+        stream.write("\U0001f3b5")
+        stream.flush()
+
+        self.assertEqual(raw.getvalue(), b"?")
+
     def test_init_dry_run_and_validate(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "dry-run"

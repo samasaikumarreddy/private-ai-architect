@@ -60,7 +60,9 @@ Optional flags:
    to `/api/chat` with streaming disabled.
 9. Instruct the model to use only supplied sources and return a fixed refusal
    token if support is insufficient.
-10. Append source paths and chunk numbers from retrieval to the final output.
+10. Reject generated answers containing uncited lines or citation numbers
+    outside the retrieved source range.
+11. Append source paths and chunk numbers from retrieval to the final output.
 
 The client never calls `/api/pull`.
 
@@ -91,6 +93,7 @@ The HTTP client also disables proxy use for local Ollama calls.
 | Ollama unavailable | Warning plus retrieval-only fallback |
 | Requested model not installed | Warning plus retrieval-only fallback |
 | Invalid Ollama response | Warning plus retrieval-only fallback |
+| Missing or unknown model citation | Warning plus retrieval-only fallback |
 | Model returns the refusal token | User-facing insufficient-evidence refusal |
 | Model returns an answer | Model answer plus citations generated from retrieval |
 
@@ -116,6 +119,7 @@ The v0.2 tests cover:
 - Installed-model preflight before chat
 - No automatic model download
 - Cited model-answer output
+- Missing and out-of-range model-citation rejection
 - Unsupported-question refusal without model invocation
 - Ollama-unavailable retrieval fallback
 - Non-loopback and cloud-model rejection

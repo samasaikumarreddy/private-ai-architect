@@ -3,6 +3,7 @@ import unittest
 from private_ai_infra.ollama import (
     OllamaClient,
     OllamaModelUnavailable,
+    OllamaUnavailable,
     validate_local_model_name,
     validate_local_ollama_url,
 )
@@ -53,7 +54,47 @@ class OllamaClientTests(unittest.TestCase):
         self.assertNotIn("Report lost devices", prompt)
         system_prompt = calls[1][2]["messages"][0]["content"]
         self.assertIn("Do not infer", system_prompt)
-        self.assertIn("end every bullet", system_prompt)
+        self.assertIn("do not number the list", system_prompt)
+        self.assertIn("never cite a source number that was not provided", system_prompt)
+
+    def test_generated_answer_with_unknown_citation_is_rejected(self):
+        def fake_request(url, method, payload, timeout):
+            if url.endswith("/api/tags"):
+                return {"models": [{"name": "test-model:latest"}]}
+            return {
+                "message": {
+                    "role": "assistant",
+                    "content": "- Supported statement [1]\n- Invented citation [2]",
+                }
+            }
+
+        client = OllamaClient(request_json=fake_request)
+
+        with self.assertRaisesRegex(OllamaUnavailable, "source number that was not provided"):
+            client.generate_grounded_answer(
+                "What is supported?",
+                [{"source_path": "source.md", "chunk_index": 0, "text": "Supported statement."}],
+                model="test-model",
+            )
+
+    def test_standalone_citation_line_is_joined_to_preceding_claim(self):
+        def fake_request(url, method, payload, timeout):
+            if url.endswith("/api/tags"):
+                return {"models": [{"name": "test-model:latest"}]}
+            return {
+                "message": {
+                    "role": "assistant",
+                    "content": "- Supported statement.\n[1]",
+                }
+            }
+
+        answer = OllamaClient(request_json=fake_request).generate_grounded_answer(
+            "What is supported?",
+            [{"source_path": "source.md", "chunk_index": 0, "text": "Supported statement."}],
+            model="test-model",
+        )
+
+        self.assertEqual(answer, "- Supported statement. [1]")
 
     def test_missing_model_stops_before_chat_and_never_downloads(self):
         calls = []
