@@ -1,0 +1,22 @@
+{
+  "allowed_document_sources": [
+    "./examples/sample-company-docs"
+  ],
+  "architect_location": "developer-workstation",
+  "audit_logging_needs": "local command history and reviewed evaluation results",
+  "authentication_rbac_needs": "single approved local developer",
+  "compliance_concerns": [
+    "none"
+  ],
+  "data_location": "local workstation",
+  "data_owner_approval": "approved",
+  "hardware_availability": "CPU or local RTX workstation",
+  "journey": "local-rag",
+  "model_preference": "llama3.2:1b",
+  "network_exposure": "localhost",
+  "owner_name": "local",
+  "project_name": "local-rag-plan",
+  "runtime_preference": "ollama",
+  "runtime_location": "same-machine",
+  "user_count": 1
+}

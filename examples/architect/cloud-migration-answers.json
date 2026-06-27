@@ -1,0 +1,23 @@
+{
+  "allowed_document_sources": [],
+  "architect_location": "admin-workstation",
+  "audit_logging_needs": "retain existing approved audit destination",
+  "authentication_rbac_needs": "preserve existing identity controls; details unresolved",
+  "compliance_concerns": [
+    "unknown"
+  ],
+  "data_location": "private target; transit path unresolved",
+  "data_owner_approval": "pending",
+  "hardware_availability": "unknown",
+  "journey": "cloud-migration",
+  "model_preference": "unknown",
+  "network_exposure": "private-network",
+  "owner_name": "example architecture team",
+  "project_name": "cloud-migration-plan",
+  "rollback_requirement": "document rollback criteria before any future migration",
+  "runtime_location": "company-gpu-server",
+  "runtime_preference": "unknown",
+  "source_provider": "user-provided provider name",
+  "source_workload": "user-provided workload description",
+  "user_count": 100
+}

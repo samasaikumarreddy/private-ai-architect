@@ -1,0 +1,22 @@
+{
+  "allowed_document_sources": [],
+  "architect_location": "admin-workstation",
+  "audit_logging_needs": "unknown",
+  "authentication_rbac_needs": "company authentication and role review required",
+  "compliance_concerns": [
+    "unknown"
+  ],
+  "data_location": "on premises",
+  "data_owner_approval": "pending",
+  "deployment_stage": "pilot",
+  "hardware_availability": "hardware purchased but compatibility not verified",
+  "journey": "private-gpu",
+  "model_preference": "unknown",
+  "network_exposure": "private-network",
+  "owner_name": "example infrastructure team",
+  "project_name": "private-gpu-plan",
+  "runtime_preference": "unknown",
+  "runtime_location": "dgx-spark",
+  "target_hardware": "DGX Spark planning input",
+  "user_count": 20
+}

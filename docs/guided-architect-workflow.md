@@ -11,8 +11,8 @@ The first decision is what the user is trying to accomplish:
 flowchart TD
     START["What are you trying to do?"]
     START --> LOCAL["Build local RAG"]
-    START --> HARDWARE["Configure new private hardware"]
-    START --> MIGRATE["Migrate from cloud AI"]
+    START --> HARDWARE["Plan private hardware requirements"]
+    START --> MIGRATE["Plan a future cloud migration"]
 
     LOCAL --> LOCALQ["Local files, RTX or CPU, runtime and model"]
     HARDWARE --> HWQ["Target hardware, network, users and operations"]
@@ -26,6 +26,76 @@ flowchart TD
 The questionnaire is a decision graph, not one long form. Answers determine
 which questions become relevant. Unknown answers remain unresolved and may
 become validation blockers.
+
+## Where The Command Runs
+
+The planning command and the future AI runtime are separate:
+
+```mermaid
+flowchart LR
+    CONTROL["Developer laptop, admin workstation, bastion, or CI runner"]
+    CONTROL -->|"private-ai architect"| PACK["Blueprint and review documents"]
+    PACK --> TARGET["Planned runtime location"]
+    TARGET --> LOCAL["Same machine or local GPU"]
+    TARGET --> SERVER["Company GPU or DGX"]
+    TARGET --> CLOUD["Approved cloud GPU"]
+    TARGET --> MAC["Mac node or cluster"]
+```
+
+v0.3 runs only on the control machine and stops after writing the review pack.
+It does not contact any target. The blueprint separately records:
+
+- `architect_location`: where the CLI is executed
+- `runtime_location`: where the future model, index, and retrieval service are
+  intended to run
+- `data_location`: where data is approved for storage and processing
+
+The governing rule is that ingestion and indexing must run where the data is
+allowed to exist. A blueprint created on a developer laptop does not permit
+company data to be copied there.
+
+## Current v0.3 Command
+
+Run the beginner-friendly interactive questionnaire:
+
+```bash
+private-ai architect
+```
+
+Or use one of the non-interactive synthetic examples:
+
+```bash
+private-ai architect --answers-file examples/architect/local-rag-answers.json --output-dir generated/architect-local --force
+private-ai architect --answers-file examples/architect/private-gpu-answers.json --output-dir generated/architect-gpu --force
+private-ai architect --answers-file examples/architect/cloud-migration-answers.json --output-dir generated/architect-cloud --force
+```
+
+The command follows this bounded flow:
+
+```text
+ask journey
+  -> ask only relevant questions
+  -> normalize answers
+  -> record unknowns and risks
+  -> generate blueprint.json and review documents
+  -> validate schema and planning boundaries
+  -> stop
+```
+
+It does not read the named document sources. It does not call cloud APIs,
+inspect hardware, generate provider configuration, deploy, or migrate.
+
+Every journey produces:
+
+- `blueprint.json`
+- `summary.md`
+- `decisions-needed.md`
+- `security-risks.md`
+- `next-steps.md`
+- `validation-report.md`
+
+See [Blueprint Schema](blueprint-schema.md) for the exact machine-readable
+contract.
 
 ## Workflow A: Build Local RAG
 
@@ -42,20 +112,15 @@ Questions include:
 - Is access localhost-only, LAN-only, or through an approved remote path?
 - Are citations and refusal on missing evidence required?
 
-Generated artifacts include:
-
-- Local Docker Compose plan
-- Model and embedding configuration
-- Approved and denied data-source policy
-- Retrieval and citation policy
-- Local network plan
-- Validation report
+v0.3 records these answers in the normalized blueprint and common review
+documents. The existing v0.2 local RAG commands remain separate; architect
+does not automatically ingest documents or start Ollama.
 
 This is the first reference implementation because it proves ingestion,
 retrieval, model inference, citations, and safe defaults on accessible
 hardware.
 
-## Workflow B: Configure New Private Hardware
+## Workflow B: Plan New Private Hardware
 
 Intended user:
 
@@ -72,21 +137,17 @@ Questions include:
 - What identity, network, monitoring, and recovery systems already exist?
 - Is this a pilot, shared internal service, or production target?
 
-Generated artifacts include:
-
-- Hardware compatibility report
-- Runtime and model configuration
-- Capacity assumptions and unresolved load-test requirements
-- Network segmentation and ingress plan
-- Identity and RBAC integration plan
-- Monitoring, backup, and recovery plan
-- Deployment, verification, and rollback runbooks
+v0.3 records hardware availability, target hardware, deployment stage, users,
+network exposure, identity needs, audit needs, unknowns, and risks. It does not
+generate hardware configuration or claim compatibility. Compatibility reports,
+runtime configuration, and deployment runbooks belong to the verified hardware
+profile milestone.
 
 DGX Spark is one target profile, not the definition of the product. Its ARM64
 architecture and verified model/runtime combinations require their own
 compatibility checks.
 
-## Workflow C: Migrate From Cloud AI
+## Workflow C: Plan A Future Cloud AI Migration
 
 Intended user:
 
@@ -103,28 +164,45 @@ Questions include:
 - What latency, quality, throughput, and availability targets must be preserved?
 - What shadow, acceptance, rollback, and approval criteria apply?
 
-Generated artifacts include:
-
-- Source workload inventory for the approved discovery scope
-- Source-to-target model and API compatibility report
-- Target deployment configuration
-- Cloud gateway and private connectivity plan
-- Application change checklist
-- Evaluation dataset requirements
-- Migration, verification, and rollback plan
-- Framework-aware evidence checklist
+v0.3 records the operator-provided source provider, workload description, and
+rollback requirement. It does not authenticate, discover resources, generate
+provider configuration, or execute migration. Provider inventory,
+compatibility analysis, gateway plans, and migration runbooks belong to later
+provider-specific milestones.
 
 Migration is incremental. The project must not imply that generating
 configuration is equivalent to proving production readiness.
+
+## Vendor-Aware RAG Direction
+
+Private AI Architect should not assume that every company wants to leave its
+existing cloud. If approved data, identity, logging, and governance already
+live in AWS or Azure, a cloud-native RAG plan may be safer than moving data to
+new local hardware.
+
+The guided product should eventually distinguish:
+
+- a first-time user starting RAG from zero
+- an existing environment choosing local, AWS-native, Azure-native, private
+  GPU/DGX, cloud GPU, Mac, or hybrid RAG
+- an existing AI workload explicitly choosing migration planning
+
+Provider-native recommendation requires additional normalized fields for
+cloud allowance, current data environment, use case, access model, read-only
+intent, and recommended architecture path. Those fields and recommendation
+rules are documented design work, not implemented v0.3 behavior.
+
+No recommendation may call provider APIs or deploy infrastructure. See
+[Starting RAG From Scratch](starting-rag-from-scratch.md).
 
 ## Controlled Lifecycle
 
 | Stage | Purpose | Mutation allowed? | Current status |
 | --- | --- | --- | --- |
 | `discover` | Read an explicitly approved provider scope. | No | Planned |
-| `plan` | Record decisions and unresolved questions. | No | Partly available through dry-run |
-| `generate` | Render proposed configuration and review artifacts. | No | Available for the current dry-run scope |
-| `validate` | Run safety and completeness checks. | No | Available for generated dry-run packs |
+| `plan` | Record decisions and unresolved questions. | No | Available through `private-ai architect` |
+| `generate` | Render a blueprint and review documents. | No | Available for the v0.3 planning scope |
+| `validate` | Run schema and planning-safety checks. | No | Available through `private-ai blueprint validate` |
 | `review` | Collect domain-owner decisions and approvals. | No | Documented; workflow automation planned |
 | `apply` | Create or change approved infrastructure. | Yes | Intentionally blocked |
 | `verify` | Test the target against the blueprint. | Test traffic only | Planned |

@@ -1,6 +1,6 @@
 # RAG Quality And Code Ingestion v0.2.1
 
-Status: development candidate.
+Status: released.
 
 v0.2.1 improves local retrieval quality and adds bounded source-code ingestion
 without introducing embeddings, cloud services, public endpoints, or

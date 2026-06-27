@@ -1,6 +1,6 @@
 # Local RAG MVP
 
-Status: v0.2.0 released; v0.2.1 quality improvements in development.
+Status: v0.2.0 and v0.2.1 released.
 
 The local RAG MVP adds optional model-generated answers to the existing local
 retrieval flow. It uses a local JSON index with BM25 scoring so the grounding

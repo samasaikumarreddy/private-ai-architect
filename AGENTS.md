@@ -4,23 +4,26 @@ These instructions apply to the entire repository.
 
 ## Current Scope
 
-The active implementation milestone is v0.2.1 local RAG quality:
+The active implementation milestone is v0.3 guided architect planning:
 
-- Safe local indexing of explicitly approved files
-- Retrieval-only cited excerpts
-- Optional local Ollama-backed answers over retrieved chunks
-- Refusal when indexed evidence is insufficient
-- Localhost-only model access
-- BM25 ranking and repeatable retrieval evaluation
-- Bounded source-code ingestion with explicit exclusions
+- Branch first on local RAG, private GPU, or cloud migration intent
+- Ask only journey-relevant questions
+- Generate a normalized, checksummed JSON blueprint
+- Keep architect CLI, target runtime, and data-residency locations separate
+- Record unknown decisions and known risks explicitly
+- Generate deterministic review documents
+- Validate planning safety without applying infrastructure
+- Preserve all v0.2 and v0.2.1 local RAG behavior
 
 Do not extend the current implementation into enterprise or migration features
 without a separately approved scope.
 
 ## Hard Boundaries
 
-- Do not implement DGX Spark behavior.
-- Do not implement Azure, AWS, Bedrock, or cloud migration.
+- Do not implement DGX Spark configuration or verification; planning labels
+  are allowed.
+- Do not implement Azure, AWS, Bedrock, cloud discovery, or migration
+  execution; user-provided planning labels are allowed.
 - Do not implement VPN or firewall mutation.
 - Do not implement Kubernetes, Terraform, SSO, or LDAP.
 - Do not implement production infrastructure apply.
@@ -43,6 +46,8 @@ private-ai modes
 private-ai ingest
 private-ai chat
 private-ai evaluate
+private-ai architect
+private-ai blueprint validate
 ```
 
 `private-ai chat` without `--model` must remain retrieval-only. Optional model
@@ -81,9 +86,10 @@ Use only the synthetic example data committed under `examples/`.
 
 Keep implementation status explicit. Do not describe planned Docker, vector
 database, web UI, MCP, hardware, cloud, or migration capabilities as working.
-Update `README.md`, `QUICKSTART.md`, `docs/local-rag-mvp.md`,
-`docs/rag-quality-v0.2.1.md`, and CLI reference when the local chat or
-ingestion contract changes.
+Update `README.md`, `QUICKSTART.md`, `docs/guided-architect-workflow.md`,
+`docs/blueprint-schema.md`, and CLI reference when the architect or blueprint
+contract changes. Update the local RAG documents when chat or ingestion
+behavior changes.
 
 Update `docs/version-test-guide.md` for every implemented version. Each version
 must include copy-and-paste commands, expected results, a safe failure or

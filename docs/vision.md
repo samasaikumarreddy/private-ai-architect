@@ -1,7 +1,7 @@
 # Vision
 
 Private AI Infrastructure Blueprint is an open-source guided architect for
-private AI deployment and migration.
+designing RAG and private AI inside an environment the user already trusts.
 
 It asks the questions an experienced infrastructure architect would ask,
 records unresolved decisions instead of guessing, generates reviewable
@@ -21,9 +21,11 @@ model:
   and integration plan.
 - A developer may have an RTX GPU and approved company documents but no safe,
   repeatable local RAG setup.
-- A cloud-integrated company may want to move inference from Azure OpenAI or
-  AWS Bedrock without discarding its existing identity, gateway, monitoring,
-  and security investments.
+- A cloud-integrated company may be safer using cloud-native RAG because its
+  approved data, identity, logging, and governance already live there.
+- Another company may have a specific reason to move inference from a cloud
+  service while retaining useful identity, gateway, monitoring, and security
+  investments.
 - Source permissions do not automatically become retrieval permissions.
 - Runtime, model, network, data, identity, audit, and rollback decisions are
   spread across different teams.
@@ -37,19 +39,19 @@ be decided and approved by people.
 
 ## Product Definition
 
-> An open-source guided architect that discovers a narrowly approved scope,
-> builds a normalized private-AI blueprint, generates deployment and migration
-> artifacts, validates risks, and produces evidence for human review.
+> An open-source guided architect that starts with data residency and trust
+> boundaries, builds a normalized private-AI blueprint, recommends a safe
+> architecture path, validates risks, and produces evidence for human review.
 
-The guided architect has three primary workflows:
+The product direction covers three broad workflows:
 
-1. **Build local RAG:** help a developer use an RTX GPU or CPU with open or
-   approved custom models over approved company data.
-2. **Configure new private hardware:** help a small business integrate a DGX
+1. **Start RAG safely:** help a first-time user choose local-first,
+   cloud-native, private, or hybrid RAG based on data location and approved
+   trust boundaries.
+2. **Plan private hardware:** help a small business prepare to integrate a DGX
    Spark, generic NVIDIA GPU server, or another supported target.
-3. **Migrate from cloud AI:** help a cloud-integrated company assess and
-   gradually move selected workloads from Azure OpenAI or AWS Bedrock while
-   retaining useful cloud identity, gateway, and monitoring services.
+3. **Plan an explicit migration:** help a company assess and gradually move a
+   selected workload only when migration is the user's stated intent.
 
 These workflows share one blueprint and validation engine, but their
 questionnaires and generated artifacts must branch early. A local developer
@@ -91,10 +93,10 @@ Choose workflow
   -> Export evidence
 ```
 
-The first proof is smaller: a developer can generate and validate a plan, start
-a local reference RAG stack, ingest approved sample documents, and receive
-cited answers. The same blueprint model then expands to private hardware and
-cloud migration workflows.
+The first proof is smaller: a developer can generate and validate a plan,
+index approved sample documents, and receive cited local answers. The same
+blueprint model then expands to vendor-aware RAG recommendations, private
+hardware, provider-specific planning, and explicit migration workflows.
 
 ## Trust And Compliance Position
 

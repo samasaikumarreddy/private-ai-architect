@@ -3,34 +3,37 @@
 [![CI](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml/badge.svg)](https://github.com/samasaikumarreddy/private-ai-architect/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/samasaikumarreddy/private-ai-architect)](LICENSE)
 
-Status: v0.2.0 local RAG is released. The CLI safely indexes approved local
-documents, returns retrieval citations, optionally generates answers with an
-installed loopback Ollama model, validates citation numbers, and refuses
-unsupported questions. The release has 27 automated tests and a documented
-RTX 3060 Laptop GPU smoke test.
+Status: v0.2.1 local RAG quality is released. The CLI safely indexes approved
+documents and bounded source code, uses BM25 retrieval, evaluates retrieval
+and refusal cases, optionally generates cited answers with an installed
+loopback Ollama model, and refuses unsupported questions.
 
-The v0.2.1 development candidate adds BM25 ranking, evaluation cases, stricter
-claim-to-source checks, and bounded source-code ingestion. Semantic vector
-retrieval, hardware deployment, and cloud migration are not implemented yet.
+The v0.3 development branch adds a guided, branching architect that produces a
+normalized checksummed blueprint and review documents. It performs no cloud
+discovery, hardware configuration, migration, or infrastructure changes.
 
 Plan, generate, validate, and eventually migrate private AI systems across
 developer machines, GPU servers, DGX Spark, and hybrid cloud environments.
 
 Private AI Architect is an open-source, security-first path from useful local
 RAG to guided private AI infrastructure. Today it provides a safe local RAG
-CLI and dry-run planning foundation. The longer-term product will ask
-workflow-specific questions, record unknown decisions instead of guessing,
-build a normalized blueprint, and generate reviewable configuration and
-migration artifacts.
+CLI, local RAG, dry-run planning, and a planning-only guided architect. The
+architect asks workflow-specific questions, records unknown decisions instead
+of guessing, and builds a normalized blueprint plus review documents.
+
+The product is not based on moving every workload away from cloud. It should
+recommend the safest RAG architecture inside the environment the user already
+trusts. That may eventually be local-first, AWS-native, Azure-native, private
+GPU/DGX, cloud GPU, Mac, or hybrid.
 
 The product supports three journeys:
 
 1. Build local RAG with a CPU, RTX GPU, or approved company GPU endpoint.
-2. Configure newly purchased private hardware such as DGX Spark or a generic
-   NVIDIA GPU server.
-3. Migrate selected Azure OpenAI or AWS Bedrock workloads to private
-   infrastructure while retaining useful cloud identity, gateway, and
-   monitoring services.
+2. Plan the integration of newly purchased private hardware such as DGX Spark
+   or a generic NVIDIA GPU server.
+3. Plan a future migration of selected cloud AI workloads to private
+   infrastructure while identifying identity, gateway, monitoring, and
+   rollback requirements.
 
 The project started documentation-led and now includes its first usable CLI
 milestone: `private-ai init --dry-run` generates a proposed review pack without
@@ -54,6 +57,8 @@ Star this repo if you want an open-source path for:
 - Integrating GPU servers or DGX Spark through guided compatibility,
   networking, identity, and operations questions.
 - Planning staged cloud-to-private AI migration with verification and rollback.
+- Planning cloud-native RAG when approved data and governance already live
+  inside that cloud boundary.
 - Generating dry-run configs before touching real infrastructure.
 - Adding RBAC, audit logs, and safe ingestion from day one.
 - Helping build a provider-neutral blueprint and plugin ecosystem.
@@ -76,7 +81,7 @@ This should become a practical open-source starting point, not a vendor-locked d
 ## Who This Is For
 
 - Developers building local AI assistants over approved documents, with
-  bounded source-code ingestion in the v0.2.1 development candidate.
+  bounded source-code ingestion in v0.2.1.
 - Teams adding RAG to internal knowledge bases.
 - Startups and small companies that need private document search.
 - Security teams reviewing AI before company rollout.
@@ -114,6 +119,14 @@ choose workflow
 
 Current implementation:
 
+- `private-ai architect` branching across local RAG, private GPU planning, and
+  cloud migration planning
+- Stable schema `1.0` JSON blueprint with checksum, unknowns, risks, and
+  explicit out-of-scope items
+- Separate architect CLI, target runtime, and data-residency locations
+- `private-ai blueprint validate`
+- Deterministic `summary.md`, `decisions-needed.md`, `security-risks.md`, and
+  `next-steps.md`
 - Python package skeleton
 - `private-ai init --dry-run`
 - Dry-run artifact generator
@@ -136,11 +149,10 @@ Current implementation:
 - Verified `llama3.2:1b` smoke test on an RTX 3060 Laptop GPU
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
-- 39 unit tests and GitHub CI on Python 3.11 and 3.12
+- 51 unit tests; GitHub CI runs on Python 3.11 and 3.12
 
 Not implemented yet:
 
-- Normalized blueprint and complete branching questionnaire
 - Real Docker images
 - Vector database writes
 - Semantic embeddings and vector retrieval
@@ -148,6 +160,15 @@ Not implemented yet:
 - Cloud provider discovery
 - Hardware-verified DGX Spark profile
 - `apply`, verification, shadowing, and cutover
+
+The private GPU and cloud migration journeys collect user-provided planning
+requirements only. They do not configure DGX systems, call provider APIs, or
+perform migration work.
+
+The architect CLI may run on a developer laptop, admin workstation, bastion,
+CI runner, or the eventual target. The blueprint separately records where the
+future model/index runtime should live and where data is approved to exist.
+Running the planner on one machine never authorizes copying private data there.
 
 ## Quickstart
 
@@ -180,6 +201,18 @@ Inspect local readiness:
 ```bash
 private-ai doctor
 ```
+
+Generate and validate a v0.3 guided architecture pack without reading the
+named document sources:
+
+```bash
+private-ai architect --answers-file examples/architect/local-rag-answers.json --output-dir generated/architect --force
+private-ai blueprint validate generated/architect
+```
+
+Run `private-ai architect` without `--answers-file` for beginner-friendly
+interactive prompts. The first question selects `local-rag`, `private-gpu`, or
+`cloud-migration`; irrelevant journey questions are omitted.
 
 Try the retrieval-only local preview:
 
@@ -227,7 +260,7 @@ Dry-run output is written under `generated/dry-run/` and is intentionally ignore
 - No compliance certification claims
 - Verification and rollback before production cutover
 
-## Current v0.2.1 Development Flow
+## Local RAG v0.2.1 Flow
 
 The implemented local flow stays narrow:
 
@@ -267,8 +300,10 @@ cutover are later milestones. See the
 - [Quickstart](QUICKSTART.md)
 - [Version Test Guide](docs/version-test-guide.md)
 - [Beginner's Guide](docs/beginner-guide.md)
+- [Starting RAG From Scratch](docs/starting-rag-from-scratch.md)
 - [Vision](docs/vision.md)
 - [Guided Architect Workflow](docs/guided-architect-workflow.md)
+- [Blueprint Schema](docs/blueprint-schema.md)
 - [Open-Source Mission](docs/open-source-mission.md)
 - [GitHub Growth Strategy](docs/github-growth-strategy.md)
 - [Launch Checklist](docs/launch-checklist.md)
@@ -303,6 +338,8 @@ private-ai modes
 private-ai ingest
 private-ai chat
 private-ai evaluate
+private-ai architect
+private-ai blueprint validate
 ```
 
 Planned but intentionally blocked:
