@@ -1,6 +1,9 @@
 # Open-Source Mission
 
-This project should help developers and companies adopt private AI without starting from a blank page. The core idea is simple: make the safe path clear enough that teams can test, review, and deploy private AI systems without accidentally exposing sensitive data.
+This project should help developers and companies adopt or migrate to private AI
+without starting from a blank page. The core idea is to turn architecture
+questions into a versioned blueprint, proposed configuration, validation
+results, and review evidence while keeping risky changes under human control.
 
 ## Who This Helps
 
@@ -15,6 +18,9 @@ Small companies:
 
 - Run private document Q&A for policies, invoices, procedures, and support notes.
 - Use CPU or small GPU deployments first.
+- Integrate newly purchased DGX Spark or other private GPU hardware.
+- Receive compatibility, networking, identity, operations, and rollback plans
+  instead of treating hardware installation as the entire migration.
 - Add access control, audit logs, and approved data-source rules from the beginning.
 
 GPU and DGX-class users:
@@ -27,7 +33,12 @@ Enterprise teams:
 
 - Review deployment mode, network exposure, data permissions, audit policy, and risk ownership before production.
 - Use dry-run output as evidence for security, network, and business approval.
-- Extend the same core model toward SSO, SIEM, Kubernetes, Terraform, and hybrid gateway designs later.
+- Discover a narrowly approved Azure OpenAI or AWS Bedrock workload through
+  provider-specific read-only plugins.
+- Retain useful cloud identity, edge, gateway, and monitoring investments while
+  moving selected inference and data processing to private infrastructure.
+- Generate migration, verification, cutover, and rollback plans without
+  pretending that production migration is one command.
 
 ## Project Values
 
@@ -38,6 +49,9 @@ Enterprise teams:
 - Reviewable before deployable.
 - Security and documentation are product features.
 - Human approval is required for risky actions.
+- Unknown decisions are reported instead of guessed.
+- Provider integrations are narrow, permissioned, and independently tested.
+- Framework-aware evidence does not equal compliance certification.
 
 ## Community Goal
 
@@ -61,8 +75,10 @@ The project should not chase stars by overclaiming. Credibility is more importan
 The project should welcome:
 
 - Deployment mode improvements
-- Wizard question improvements
+- Branching question-graph improvements
+- Blueprint schema and migration improvements
 - Config generators
+- Source discovery and target plugins
 - Local model runtime integrations
 - Vector database integrations
 - Security validation rules
@@ -77,16 +93,25 @@ The project should reject:
 - Autonomous cyber remediation in v1
 - Vendor lock-in that prevents local/private deployment
 - Changes that weaken audit, RBAC, validation, or dry-run guarantees
+- Broad cloud-account discovery disguised as a simple setup step
+- Compliance or production-readiness claims unsupported by evidence
+- Cutover automation without health checks and rollback
 
 ## Positioning
 
 Short description:
 
-> An open-source blueprint for deploying private AI infrastructure across local developer machines, small companies, GPU servers, DGX Spark, and enterprise environments with dry-run planning, RAG, RBAC, audit logging, and secure networking guidance.
+> An open-source guided architect for local RAG, private GPU and DGX
+> deployments, and staged cloud-to-private AI migration with dry-run
+> generation, validation, approval boundaries, and evidence.
 
 Long description:
 
-> Private AI Infrastructure Blueprint helps developers and organizations plan, validate, and deploy private AI assistants over approved internal data. It starts with documentation, dry-run setup, generated configs, and security guardrails, then grows toward local RAG, developer assistant, cyber analyst, GPU server, DGX-class, and hybrid cloud gateway deployments.
+> Private AI Infrastructure Blueprint asks workflow-specific architecture
+> questions, builds a normalized blueprint, generates proposed configuration
+> and migration artifacts, validates risks, and produces evidence for human
+> review. It starts with a working local RAG reference, expands to private GPU
+> and DGX targets, then adds narrow Azure and AWS migration paths.
 
 ## What Good Contributions Look Like
 

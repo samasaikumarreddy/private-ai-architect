@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "private-ai-infra-blueprint"
 version = "0.1.0"
-description = "Open-source blueprint and CLI for planning private AI infrastructure with dry-run safety."
+description = "Open-source guided architect for local RAG, private GPU infrastructure, and staged AI migration."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -19,6 +19,8 @@ keywords = [
   "llmops",
   "ai-infrastructure",
   "dgx",
+  "dgx-spark",
+  "cloud-migration",
   "qdrant",
   "ollama"
 ]
@@ -36,13 +38,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint"
-Documentation = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint/tree/main/docs"
-Issues = "https://github.com/private-ai-infra-blueprint/private-ai-infra-blueprint/issues"
+Homepage = "https://github.com/samasaikumarreddy/private-ai-architect"
+Documentation = "https://github.com/samasaikumarreddy/private-ai-architect/tree/main/docs"
+Issues = "https://github.com/samasaikumarreddy/private-ai-architect/issues"
 
 [project.scripts]
 private-ai = "private_ai_infra.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

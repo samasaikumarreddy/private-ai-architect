@@ -68,9 +68,12 @@ The doctor command reports missing tools as warnings. Docker, Ollama, and NVIDIA
 
 High-impact early contributions:
 
-- Add wizard question files.
+- Define the versioned local blueprint schema.
+- Add workflow intent and conditional question-graph tests.
 - Improve validation rules.
 - Add config schema tests.
 - Add more safe example configs.
 - Improve generated review docs.
-- Add the local RAG MVP in small pieces.
+- Add the local RAG reference in tested vertical slices.
+- Define target-specific compatibility tests without claiming unsupported
+  hardware.

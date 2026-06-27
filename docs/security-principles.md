@@ -4,7 +4,9 @@ Private AI systems should fail closed. The safest defaults should require less e
 
 ## Default Rules
 
-- Keep sensitive company data inside the trusted environment.
+- Record storage, processing, transit, telemetry, and backup locations
+  separately.
+- Keep sensitive company data inside the approved boundaries.
 - Use dry-run before apply.
 - Require validation before deployment.
 - Use least privilege for users, services, and data sources.
@@ -14,6 +16,23 @@ Private AI systems should fail closed. The safest defaults should require less e
 - Do not expose the LLM runtime directly to the internet.
 - Do not store secrets in Git.
 - Do not ingest secrets, credentials, keys, or `.env` files.
+- Do not persist cloud discovery credentials.
+- Do not claim regulatory compliance from configuration checks.
+- Keep discovery, generation, approval, apply, verification, and cutover as
+  separate permissions.
+
+## Guided Architect Safety
+
+- Select workflow intent before asking target-specific questions.
+- Treat unresolved critical answers as blockers.
+- Require discovery plugins to publish exact read permissions.
+- Restrict discovery to allowlisted providers, resources, and fields.
+- Avoid reading provider prompt, response, or document content by default.
+- Bind every approval to an exact blueprint revision.
+- Mark generated infrastructure as proposed until an apply implementation
+  records otherwise.
+- Require verification before calling a target operational.
+- Require explicit rollback criteria before changing production traffic.
 
 ## RBAC Model
 
@@ -136,6 +155,39 @@ The network layer should:
 - Document every exposed port.
 - Separate admin access from user chat access where practical.
 - Log gateway access.
+- Apply on-premises admission control even when a cloud WAF is present.
+- Disable cloud payload logging by default when prompts or responses transit a
+  managed gateway.
+
+## Framework-Aware Evidence
+
+Governance framework selections may activate relevant questions, checks, and
+evidence requirements. Reports must use these states:
+
+- Control detected
+- Control missing
+- Requires human evidence
+- Not evaluated
+
+The tool must not issue compliance certifications. Legal applicability,
+administrative safeguards, physical controls, policies, contracts, and risk
+acceptance require authorized human review.
+
+## Derived Knowledge Safety
+
+An optional generated wiki must preserve the distinction between evidence and
+synthesis:
+
+- Raw sources remain immutable.
+- Generated pages are labeled derived.
+- Every generated claim retains source and chunk provenance.
+- Effective access is the intersection of contributing source permissions.
+- Source changes or deletion mark dependent pages stale.
+- Sensitive changes enter a review queue before publication.
+- Agent read and write tools remain separate.
+
+Vector or KV-cache compression must fail closed when runtime support is unknown
+and must require a quality benchmark before activation.
 
 ## Cyber Analyst Mode
 
@@ -159,4 +211,3 @@ Blocked:
 - Direct shell execution
 - Malware execution
 - Unsafe dynamic analysis
-

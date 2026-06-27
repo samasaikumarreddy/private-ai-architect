@@ -1,204 +1,178 @@
 # GitHub Growth Strategy
 
-Target: build a project strong enough to earn 10,000 GitHub stars.
+Target: build a project useful enough to earn 10,000 GitHub stars.
 
-Stars are not the product. They are a signal that the project is useful, trusted, easy to explain, and easy to share. The real goal is to help developers integrate AI into local workspaces, company RAG systems, GPU servers, DGX Spark, and enterprise environments safely.
+Stars are not the product and cannot be guaranteed. They are a signal that the
+project solves a visible problem, works quickly, earns trust, and gives
+contributors meaningful extension points.
 
-## Core Positioning
+## Defensible Positioning
 
 One-line pitch:
 
-> Open-source private AI infrastructure blueprint for local dev AI, RAG over company docs, GPU servers, DGX Spark, and enterprise deployments with dry-run planning, RBAC, audit logs, and safe defaults.
+> Open-source guided architect for local RAG, private GPU and DGX deployments,
+> and staged cloud-to-private AI migration.
 
-Short pitch:
+Expanded pitch:
 
-> Most developers can build a RAG demo. Fewer teams know how to deploy private AI safely inside a company. This project gives developers and companies a guided, security-first path from local AI prototypes to reviewed private AI infrastructure.
+> Answer relevant architecture questions, generate a versioned private-AI
+> blueprint, validate security and compatibility, and produce deployment,
+> verification, migration, and rollback artifacts before production changes.
 
-## Why People Would Star It
+The project should not compete primarily on chat UI polish. Existing local RAG
+tools already provide fast chat and document workflows. The differentiator is
+the combination of:
 
-Developers star projects when they see one or more of these:
-
-- It solves a real problem they already have.
-- It teaches them a better architecture.
-- It gives them a working starter kit.
-- It saves time on setup.
-- It has strong security defaults.
-- It supports tools they already care about.
-- It has a clear roadmap and contributor path.
-- It looks active, serious, and well maintained.
-
-This repo should optimize for those reasons, not vanity metrics.
+- Early workflow branching
+- Dry-run architecture generation
+- Provider-neutral normalized blueprint
+- Security and compatibility validation
+- Hardware and cloud migration profiles
+- Explicit approvals and unresolved decisions
+- Verification, rollback, and evidence
 
 ## Audience Segments
 
-| Audience | What they care about | Repo promise |
+| Audience | Immediate problem | Project promise |
 | --- | --- | --- |
-| Individual developer | Local AI over private files | Run a safe local RAG path first. |
-| RAG builder | Retrieval architecture and citations | Use approved data sources, RBAC, and audit. |
-| Startup or small company | Private document Q&A | Deploy without enterprise hardware. |
-| GPU user | Better local inference | Use Ollama, vLLM, NIM, or similar runtimes. |
-| DGX Spark / DGX-class user | Serious local AI deployment | Map high-end hardware into a secure architecture. |
-| Security engineer | Risk control | Review dry-run plans before deployment. |
-| Open-source contributor | Clear build path | Pick focused issues with clear safety boundaries. |
+| Local developer | Use approved private files with local models | A working cited RAG reference on CPU or RTX. |
+| Small business | Integrate newly purchased GPU or DGX Spark hardware | Guided compatibility, network, identity, and operations planning. |
+| Cloud platform team | Move a selected Azure OpenAI or Bedrock workload | Narrow discovery and staged migration artifacts. |
+| Security reviewer | Understand exposure before deployment | Reviewable blueprint, data flow, controls, blockers, and evidence gaps. |
+| Infrastructure architect | Avoid rebuilding every checklist and template | Extensible source, target, runtime, gateway, generator, and validator plugins. |
+| Contributor | Work on a focused, testable integration | Clear plugin contracts and target-specific acceptance tests. |
 
-## 10k-Star Path
+## Product Signals Required For Growth
 
-### Phase 1: Trust Before Hype
+### Signal 1: Trust
 
-Goal: make the repo credible.
+- Honest implementation status
+- Apache 2.0 license and security policy
+- No real credentials or company data
+- Clear non-goals and approval boundaries
+- No unsupported compliance or production claims
 
-Required:
+### Signal 2: Ten-Minute Value
 
-- Strong README
-- Apache 2.0 license
-- Security policy
-- Contribution guide
-- Clear docs map
-- Launch checklist
-- No fake implementation claims
-- No real secrets or company data
+- Install without unusual infrastructure
+- Run `doctor`
+- Generate and validate a useful dry-run pack
+- Start the local RAG reference
+- Ingest synthetic sample docs
+- Receive a cited answer
 
-Success signal:
+The local working path is required before serious promotion.
 
-- Developers can understand the mission in under one minute.
+### Signal 3: Distinctive Demonstration
 
-### Phase 2: Useful Without Code
+A strong demo should show:
 
-Goal: make the blueprint valuable even before the MVP exists.
+1. Selecting one of the three workflows.
+2. Irrelevant questions disappearing.
+3. A normalized blueprint being generated.
+4. A risky configuration failing validation.
+5. A corrected local stack returning a cited answer.
+6. A future DGX or Azure migration pack clearly marked proposed.
 
-Required:
+### Signal 4: Real Hardware Proof
 
-- Architecture diagrams
-- Deployment modes
-- Threat model
-- Dry-run output examples
-- Config schema examples
-- Hardware/runtime guidance
-- Decision checklists
+The DGX Spark profile needs:
 
-Success signal:
+- Named tested software versions
+- ARM64 compatibility evidence
+- Reproducible setup and smoke tests
+- Measured model and concurrency results
+- Failure and recovery notes
 
-- A developer can use the docs to plan their own private AI deployment.
+Screenshots or generated templates alone are not hardware support.
 
-### Phase 3: First Working CLI
+### Signal 5: Credible Migration Proof
 
-Goal: move from blueprint to usable tool.
+The first Azure path needs:
 
-Required:
+- Exact read-only permission manifest
+- Narrow supported discovery scope
+- Redacted snapshot
+- Compatibility mapping
+- Generated but unapplied gateway and target configuration
+- Verification and rollback plan
 
-- `private-ai init --dry-run`
-- Generated review pack
-- Config validation
-- Example RBAC
-- Example data sources
-- Example Docker Compose output
+Shadowing and canary traffic should be promoted only after failure and rollback
+tests exist.
 
-Success signal:
+## Release And Community Sequence
 
-- A developer can run one command and get useful generated artifacts.
+1. Publish the honest v0.1 dry-run foundation for early contributors.
+2. Launch broadly when v0.2 produces a local model answer with valid citations.
+3. Recruit NVIDIA and ARM64 contributors for verified hardware profiles.
+4. Publish a measured DGX Spark integration report.
+5. Recruit Azure infrastructure and security contributors for narrow discovery.
+6. Demonstrate a staged migration in a disposable test environment.
+7. Add AWS as an independently tested provider path.
 
-### Phase 4: Local RAG MVP
+## Launch Assets
 
-Goal: prove the stack.
+- Two-minute local RAG demonstration
+- Guided architect workflow diagram
+- Example generated blueprint
+- Validation failure and correction example
+- DGX Spark compatibility report when verified
+- Cloud migration data-flow diagram
+- Explicit comparison with local RAG applications
+- Focused contributor issues for each plugin boundary
 
-Required:
+## Repository Quality Checklist
 
-- Local document ingestion
-- Secret filtering
-- Vector database
-- Local LLM runtime
-- Cited answers
-- Audit logs
-- Streamlit or simple web UI
+- [ ] README value is clear in the first screen.
+- [ ] Current and planned capabilities are visibly separated.
+- [ ] Beginner quickstart works from a clean machine.
+- [ ] Documentation links and Mermaid diagrams render.
+- [ ] Local RAG provides grounded answers and refusals.
+- [ ] Generated artifacts record schema and generator versions.
+- [ ] No provider plugin requests undocumented permissions.
+- [ ] No target is called supported without target-specific tests.
+- [ ] Good first issues are small and reproducible.
+- [ ] Architecture issues include acceptance and safety criteria.
 
-Success signal:
-
-- A developer can clone the repo, ingest sample docs, and ask cited questions locally.
-
-### Phase 5: Community Launch
-
-Goal: share something real.
-
-Channels:
-
-- GitHub
-- Hacker News
-- Reddit communities focused on local AI, self-hosting, Python, homelab, cybersecurity, and machine learning engineering
-- LinkedIn technical posts
-- X/Twitter technical threads
-- Dev.to or personal engineering blog
-- YouTube demo
-- Discord and Slack communities where self-hosted AI is discussed
-
-Launch asset:
-
-- One short demo video
-- One architecture image
-- One "run dry-run in 60 seconds" example
-- One honest comparison to a basic RAG demo
-- One clear call for contributors
-
-Success signal:
-
-- People open issues, request integrations, and share deployment needs.
-
-## Repo Quality Checklist
-
-- [ ] README explains value in the first screen.
-- [ ] Quickstart exists.
-- [ ] Docs are navigable.
-- [ ] License is clear.
-- [ ] Security policy exists.
-- [ ] Contribution guide exists.
-- [ ] Issue templates exist.
-- [ ] Good first issues exist.
-- [ ] Roadmap is realistic.
-- [ ] No overclaiming.
-- [ ] No real secrets.
-- [ ] Examples are runnable.
-- [ ] First demo can be understood in under two minutes.
-
-## Topics For GitHub
-
-Suggested repository topics:
+## Suggested GitHub Topics
 
 ```text
 private-ai
 rag
 local-ai
 ai-infrastructure
+cloud-migration
 llmops
 ollama
 vllm
 nvidia-nim
-dgx
-vector-database
+dgx-spark
 qdrant
-chroma
-fastapi
-cybersecurity
+terraform
+azure-openai
+aws-bedrock
 self-hosted
 enterprise-ai
 ```
 
-## Maintainer Rules For Growth
+## Maintainer Rules
 
 - Ship working artifacts before broad promotion.
-- Keep the README honest as implementation catches up.
-- Turn repeated questions into docs.
-- Turn repeated setup friction into CLI behavior.
-- Label issues clearly.
-- Keep first-time contributor tasks small.
-- Reject unsafe shortcuts even if they seem popular.
-- Publish progress regularly.
+- Keep the README synchronized with implementation.
+- Publish measurements and limitations with hardware claims.
+- Keep discovery permissions narrow and visible.
+- Treat repeated setup friction as a workflow or validation improvement.
+- Reject provider templates that are not validated.
+- Reject compliance and production claims that lack evidence.
+- Keep first-time contributor tasks bounded.
+- Publish progress, failures, and changed assumptions.
 
 ## What Not To Do
 
 - Do not buy stars.
-- Do not overpromise enterprise readiness before implementation exists.
-- Do not copy private company data into examples.
-- Do not make the project depend on one vendor.
-- Do not launch with a confusing README.
-- Do not promote remote access features before the safety model is clear.
-- Do not weaken security principles to make a demo look easier.
-
+- Do not market the project as an automatic enterprise migration.
+- Do not claim data remains entirely on-premises when payloads transit cloud.
+- Do not claim full cloud inventory.
+- Do not treat AWS as renamed Azure configuration.
+- Do not make one DGX Spark sound highly available.
+- Do not weaken review or rollback requirements for a cleaner demo.

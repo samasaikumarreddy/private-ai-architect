@@ -22,6 +22,9 @@ Dry-run mode must not:
 - Ingest real company data
 - Download models unless explicitly allowed for local planning
 - Write secrets into generated files
+- Connect to cloud provider APIs
+- Persist cloud credentials
+- Change production traffic
 
 Dry-run mode may:
 
@@ -52,7 +55,7 @@ generated/
     validation-report.md
 ```
 
-## Wizard Flow
+## Current v0.1 Flow
 
 1. Select deployment mode.
 2. Identify company, department, and business goal.
@@ -66,6 +69,17 @@ generated/
 10. Generate validation report.
 11. Print next steps.
 
+This is an early flat question flow. The planned guided architect will first
+select one intent:
+
+- Build local RAG
+- Configure new private hardware
+- Migrate a selected cloud AI workload
+
+It will then ask only relevant questions and generate a normalized blueprint.
+Read-only cloud discovery is a separate, explicitly authorized future action;
+it is not part of `init --dry-run` today.
+
 ## Dry-Run Review Gates
 
 The generated pack should be reviewed by:
@@ -76,6 +90,9 @@ The generated pack should be reviewed by:
 - Network engineer for exposure, ports, DNS, VPN, and gateway choices
 - AI engineer for model, embeddings, retrieval, and evaluation settings
 - Developer or operator for deployment feasibility
+- Privacy, legal, or compliance reviewer when a governance framework or
+  regulated data class is selected
+- Migration owner when an existing production workload is in scope
 
 ## Example Review Checklist
 
@@ -89,17 +106,23 @@ The generated pack should be reviewed by:
 [ ] Audit logging is enabled for production.
 [ ] Admin role assignment is explicit.
 [ ] Secrets are excluded from ingestion.
-[ ] Cyber mode is read-only.
-[ ] Apply command is blocked until validation passes.
+[ ] Storage, processing, transit, logging, and telemetry locations are explicit.
+[ ] Governance framework applicability remains unverified until human review.
+[ ] Apply is blocked until validation and required approvals pass.
+[ ] Production traffic cannot change without verification and rollback criteria.
 ```
 
 ## Promotion to Apply
 
-Dry-run output should not automatically become active configuration. Promotion should be explicit:
+Dry-run output should not automatically become active configuration. The
+following represents a future lifecycle:
 
 ```bash
 private-ai validate generated/dry-run
 private-ai apply generated/dry-run
 ```
 
-`apply` should refuse to run if validation has not passed or if the dry-run pack contains unresolved blocking findings.
+`apply` is intentionally blocked in v0.1. A future implementation should refuse
+to run unless validation passes, required owners approve the exact blueprint
+revision, and no blocking decision remains unresolved. Validation alone is not
+approval.

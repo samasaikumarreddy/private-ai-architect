@@ -1,187 +1,176 @@
 # Deployment Modes
 
-The setup wizard should guide the user into one of six modes. Each mode changes defaults, questions, generated files, validation strictness, and deployment expectations.
+Workflow intent and deployment target are separate decisions.
 
-## Mode Summary
+First, the guided architect asks whether the user wants to build local RAG,
+configure new private hardware, or migrate a cloud AI workload. It then asks
+only the questions required to select and validate a target profile.
 
-| Mode | Best for | Default exposure | Hardware |
+The current v0.1 CLI exposes six planning profiles. Future schema versions will
+separate `workflow.intent` from `target.type` while preserving compatible
+profile aliases where practical.
+
+## Workflow And Target Selection
+
+```mermaid
+flowchart LR
+    INTENT["Workflow intent"] --> LOCAL["Build local RAG"]
+    INTENT --> NEW["Configure private hardware"]
+    INTENT --> MIGRATE["Migrate cloud AI"]
+
+    LOCAL --> LAPTOP["Developer machine"]
+    LOCAL --> REMOTE["Approved company GPU endpoint"]
+    NEW --> GPU["Generic GPU server"]
+    NEW --> DGX["DGX Spark or DGX-class target"]
+    MIGRATE --> HYBRID["Private target plus cloud integration"]
+```
+
+## Current Planning Profiles
+
+| CLI mode | Best for | Default exposure | Runtime status |
 | --- | --- | --- | --- |
-| Local Developer | Developer proof of concept | Localhost only | Laptop or workstation |
-| Small Company | Internal document assistant | LAN or VPN | CPU or small GPU server |
-| GPU Server | Multi-user private AI | LAN or VPN | Dedicated GPU server |
-| DGX / Enterprise | Large private AI workloads | Enterprise network | DGX-class or enterprise AI server |
-| Hybrid Cloud Gateway | Remote access with private processing | Gateway plus tunnel | Private server plus cloud gateway |
-| Dry-Run Planning Only | Review before build | None | No runtime required |
+| `local-developer` | Developer proof of concept | Localhost only | Dry-run and retrieval preview |
+| `small-company` | Shared internal assistant planning | LAN or VPN | Dry-run |
+| `gpu-server` | Dedicated GPU service planning | LAN or VPN | Dry-run |
+| `dgx-enterprise` | DGX-class planning | Enterprise network | Dry-run; not hardware-verified |
+| `hybrid-gateway` | Cloud/private gateway planning | Gateway plus private path | Dry-run |
+| `dry-run-only` | Architecture review | None | Dry-run |
 
-## Local Developer Mode
+These modes generate proposed artifacts. They do not deploy containers, cloud
+resources, networks, or model runtimes.
 
-Use this when a developer has approved access to company files and wants to test a private assistant locally.
+## Local Developer Target
 
-Default assumptions:
+Use for a developer with approved files and a CPU or RTX-class GPU.
+
+Defaults:
 
 - Localhost-only access
-- Docker Compose
-- Local folders as data sources
-- Ollama or small vLLM model
-- Chroma or Qdrant
-- Streamlit UI
-- Read-only developer assistant
-- No production data unless explicitly approved
+- Docker Compose target
+- Approved local folders
+- Ollama or another compatible local runtime
+- Read-only retrieval and citations
+- No production company data without approval
 
-Required outputs:
+Validation must block broad home-directory ingestion, secret-like files,
+unreviewed public binding, and direct model exposure.
 
-- `.env`
-- `docker-compose.yml`
-- `rag-config.yaml`
-- `developer-mode.md`
-- `data-source-plan.md`
+## Small Company Target
 
-Validation must block:
+Use for a shared internal assistant or a small business integrating its first
+private GPU system.
 
-- Ingesting home directories without explicit approved subpaths
-- Ingesting `.env`, keys, tokens, or credentials
-- Binding services to `0.0.0.0` without network review
-- Enabling code modification actions in v1
+Defaults:
 
-## Small Company Mode
-
-Use this for an internal assistant over company documents such as HR policies, invoices, SOPs, or IT support notes.
-
-Default assumptions:
-
-- LAN-only or VPN-only access
-- Local auth
+- LAN-only, VPN-only, or approved zero-trust access
 - Role-based document collections
 - Audit logging required
-- Docker Compose deployment
-- Optional small GPU
+- Named data, security, network, and operations owners
+- Docker Compose until scale or availability requires another orchestrator
+- Backup, restore, monitoring, and capacity plans required for production
 
-Required outputs:
+## Generic GPU Server Target
 
-- `company-ai-charter.md`
-- `network-plan.md`
-- `rbac.yaml`
-- `audit-policy.yaml`
-- `data-sources.yaml`
-- `deployment-plan.md`
-
-Validation must block:
-
-- Production mode without audit logs
-- Remote access without network owner approval
-- Admin role assignment without explicit confirmation
-- Shared accounts for sensitive collections
-
-## GPU Server Mode
-
-Use this when the company has a stronger GPU workstation or server and expects multiple users or larger document sets.
-
-Default assumptions:
-
-- Centralized API backend
-- Qdrant, Milvus, or another managed vector database
-- Postgres audit store
-- vLLM, NVIDIA NIM, or Ollama depending on hardware
-- Department-level collections
-- VPN or Zero Trust access
-
-Required outputs:
-
-- `gpu-server-plan.md`
-- `model-config.yaml`
-- `retrieval-config.yaml`
-- `resource-sizing.md`
-- `network-plan.md`
-- `security-review.md`
+Use when a company owns a GPU workstation or server that will serve multiple
+users or larger document collections.
 
 Validation must check:
 
-- GPU availability and runtime compatibility
-- Model memory requirements
+- CPU architecture, GPU, driver, container runtime, and model compatibility
+- Memory and disk assumptions
+- Concurrent request limits and admission control
 - Collection-level RBAC
-- Audit retention policy
-- Backup and recovery expectations
+- Monitoring, audit retention, backup, and recovery
+- Network segmentation and ingress ownership
 
-## DGX / Enterprise Mode
+## DGX Spark Target
 
-Use this for enterprise AI infrastructure with stronger hardware, formal security review, and multiple departments.
+Use when integrating DGX Spark as a local development, pilot, or carefully
+reviewed service target.
 
-Default assumptions:
+The target profile must account for:
 
-- SSO, LDAP, OAuth, or Active Directory integration
-- Central audit logging
+- ARM64 compatibility
+- Supported NVIDIA container and runtime versions
+- Verified NIM or vLLM model combinations
+- Unified-memory behavior
+- Model storage and download requirements
+- Capacity, concurrency, and thermal assumptions
+- Lack of high availability when only one device exists
+
+The project must not imply that one DGX Spark automatically provides an
+enterprise-grade highly available service.
+
+## DGX-Class Or Enterprise Target
+
+Use for larger multi-user systems with formal operations and security review.
+
+Expected requirements:
+
+- Enterprise identity integration
 - Network segmentation
-- Separate admin and runtime access
-- Change approval before apply
-- SIEM forwarding where required
+- Separate administration and runtime access
+- Central monitoring and audit export
+- Resource quotas and workload isolation
+- Change approval and rollback
+- High-availability and disaster-recovery decisions
 
-Required outputs:
+Specific hardware and orchestration profiles should be implemented and tested
+individually rather than hidden behind a generic "enterprise" claim.
 
-- `enterprise-architecture.md`
-- `sso-plan.md`
-- `network-segmentation.md`
-- `threat-model.md`
-- `audit-forwarding.md`
-- `runbook.md`
+## Hybrid Cloud Gateway Target
 
-Validation must block:
+Use when cloud-integrated organizations retain cloud identity, edge security,
+gateway, or monitoring while moving selected inference and data processing to
+private infrastructure.
 
-- Local-only authentication in production enterprise mode unless approved
-- Missing owner for risk, data, or operations
-- Remote access without segmented network design
-- Shared model runtime without resource controls
+The blueprint must choose one of two patterns:
 
-## Hybrid Cloud Gateway Mode
+1. **Cloud-relayed data plane:** prompts and responses transit the cloud
+   gateway before reaching private infrastructure.
+2. **Cloud-managed control plane:** cloud identity and management authorize a
+   direct VPN or zero-trust private data path.
 
-Use this when users need remote access but the company wants data and inference to remain private.
+Required controls include:
 
-Cloud layer may handle:
+- Cloud WAF and edge rate limits where relevant
+- On-premises admission control and concurrency limits
+- Private connectivity with named ownership
+- Direct model and database exposure blocked
+- Payload logging explicitly disabled or approved
+- Storage, processing, transit, and telemetry locations documented separately
 
-- Authentication
-- Gateway routing
-- Rate limits
-- Admin dashboard shell
-- Audit forwarding
-- Secure tunnel coordination
+Cloud services can reduce exposure, but they do not prevent valid-looking
+requests from exhausting private model capacity.
 
-Private layer must handle:
+## Cloud Migration Source Profiles
 
-- Company documents
-- Embeddings
-- Vector database
-- Local LLM inference
-- RAG retrieval
-- Sensitive logs
-- Prompt and response handling
+Migration sources are discovery plugins, not deployment targets.
 
-Validation must block:
+Planned order:
 
-- Uploading private documents to the gateway by default
-- Storing embeddings in the gateway by default
-- Exposing the private model runtime directly
-- Tunnel configuration without named network owner
+1. Narrow Azure OpenAI deployment discovery
+2. Azure hybrid gateway generation
+3. Shadow and cutover planning
+4. AWS Bedrock discovery
+5. AWS hybrid gateway generation
 
-## Dry-Run Planning Only
+Each plugin must publish its exact read permissions and supported resource
+types. Full cloud-account inventory is out of scope.
 
-Use this when stakeholders want to understand the deployment before any runtime exists.
+## Dry-Run Planning
 
-Default assumptions:
+Dry-run is a lifecycle behavior available to every workflow and target, not a
+hardware type.
 
-- No containers start
-- No firewall changes occur
-- No users are created
-- No data is ingested
-- No ports are exposed
-- Generated files are clearly marked proposed
+Dry-run must not:
 
-Required outputs:
+- Start containers
+- Change firewall or cloud resources
+- Create users or roles
+- Download models
+- Ingest real company data
+- Expose ports
+- Persist provider credentials
 
-- `architecture-plan.md`
-- `stakeholder-checklist.md`
-- `network-requirements.md`
-- `security-review.md`
-- `proposed-docker-compose.yml`
-- `proposed-rbac.yaml`
-- `proposed-env.example`
-- `data-source-plan.md`
-
+Generated files must be marked proposed and list unresolved decisions.

@@ -1,129 +1,254 @@
 # Architecture
 
-The architecture separates planning, configuration generation, application runtime, data ingestion, model inference, and audit evidence. The safest deployment path is to keep company data, vector indexes, prompts, responses, and logs inside a trusted local or on-premises environment.
+The product is a guided architect, not only a RAG application. It turns
+workflow-specific answers and narrowly approved discovery results into a
+normalized blueprint, then uses that blueprint to generate, validate, review,
+and eventually verify private-AI deployments.
 
-## High-Level Components
+The local RAG stack is the first reference target. It proves that the generated
+runtime configuration works before the project expands into private hardware
+integration and cloud migration.
 
-```text
-User
-  -> Web UI or CLI
-  -> API backend
-  -> Auth and RBAC
-  -> RAG service
-  -> Retrieval layer
-  -> Vector database
-  -> Local model runtime
-  -> Audit log
+## Product Architecture
+
+```mermaid
+flowchart TD
+    USER["CLI or future web interface"] --> QUESTIONS["Branching questionnaire"]
+    USER --> DISCOVERY["Provider-specific read-only discovery"]
+    QUESTIONS --> BLUEPRINT["Versioned normalized blueprint"]
+    DISCOVERY --> BLUEPRINT
+
+    BLUEPRINT --> GENERATORS["Artifact generators"]
+    BLUEPRINT --> VALIDATORS["Policy and compatibility validators"]
+    GENERATORS --> REVIEW["Review pack and unresolved decisions"]
+    VALIDATORS --> REVIEW
+
+    REVIEW --> APPROVAL["Human approvals"]
+    APPROVAL --> APPLY["Apply engine"]
+    APPLY --> VERIFY["Verification and evidence"]
+
+    BLUEPRINT --> LOCAL["Local RAG target"]
+    BLUEPRINT --> HARDWARE["DGX or GPU server target"]
+    BLUEPRINT --> HYBRID["Cloud-to-private migration target"]
 ```
 
-## Component Responsibilities
+`apply`, production verification, shadow traffic, and cutover remain planned.
+They must not be implied by the current dry-run implementation.
 
-| Component | Responsibility |
+## Architectural Layers
+
+| Layer | Responsibility |
 | --- | --- |
-| Setup wizard | Ask role-specific questions and produce configuration artifacts. |
-| Config generator | Render `.env`, Docker Compose, RBAC, data-source, network, and policy files. |
-| Validator | Check for unsafe or incomplete configuration before apply. |
-| Web UI | Provide chat, admin summary, ingestion status, and audit views. |
-| API backend | Enforce auth, roles, retrieval permissions, and audit logging. |
-| RAG pipeline | Chunk, embed, retrieve, rerank, ground, and cite approved sources. |
-| Vector database | Store embeddings and metadata for approved document collections. |
-| Model runtime | Run local LLM inference through Ollama, vLLM, NVIDIA NIM, or another approved runtime. |
-| Audit store | Record setup, ingestion, retrieval, chat, admin, and validation events. |
+| Experience | CLI today; later a web interface using the same workflow APIs. |
+| Question graph | Ask only questions relevant to local RAG, new hardware, or cloud migration. |
+| Discovery plugins | Read a narrow provider scope with documented least-privilege permissions. |
+| Blueprint | Store versioned intent, facts, unresolved decisions, governance requirements, and approvals. |
+| Generators | Render proposed runtime, model, network, identity, data, cloud, migration, and rollback artifacts. |
+| Validators | Check schema, security, compatibility, completeness, review state, and target-specific rules. |
+| Apply adapters | Perform explicitly approved infrastructure changes; intentionally absent today. |
+| Verification | Compare the deployed target with the blueprint and acceptance criteria. |
+| Evidence | Export decisions, discovery scope, checks, warnings, approvals, and test results. |
 
-## Trust Boundaries
+## Blueprint As The Source Of Truth
 
-The main trust boundaries are:
-
-- User device to private AI application
-- Application to data-source connectors
-- Application to vector database
-- Application to model runtime
-- Private environment to optional cloud gateway
-- Admin/configuration plane to runtime plane
-
-Each boundary should have an explicit access rule, log event, and owner.
-
-## MVP Runtime Architecture
+The blueprint must be provider-neutral at its core. Provider details belong in
+typed source, gateway, and target sections rather than being scattered across
+templates.
 
 ```text
-Browser or CLI
-  -> FastAPI backend
-  -> Session/JWT auth
-  -> YAML RBAC policy
-  -> RAG orchestration
-  -> Qdrant or Chroma
-  -> Ollama or vLLM
-  -> Postgres audit log
+Question answers + approved discovery
+  -> normalized blueprint
+  -> target-specific generators
+  -> target-specific validators
+  -> review and approval
+  -> apply and verify
 ```
 
-MVP deployment should use Docker Compose so a local developer or small company can run the system without Kubernetes.
+Every generated file should record:
 
-## Hybrid Gateway Architecture
+- Blueprint schema version
+- Generation timestamp
+- Target profile
+- Generator version
+- Input checksum
+- Whether it is proposed or applied
+- Owning reviewer
 
-Hybrid mode keeps sensitive processing on the private side. The cloud side should only coordinate access.
+Unknown values must remain unresolved. Generators must not silently invent
+production network ranges, identity settings, compliance applicability, model
+capacity, or rollback criteria.
+
+## Plugin Boundaries
+
+Plugins should be small and independently testable:
+
+- **Source discovery:** Azure OpenAI, AWS Bedrock, or another approved source.
+- **Target:** local CPU/RTX, generic NVIDIA GPU server, DGX Spark, or later
+  enterprise targets.
+- **Runtime:** Ollama, vLLM, NVIDIA NIM, or another compatible runtime.
+- **Gateway:** local-only, VPN, Azure, AWS, or another reviewed access path.
+- **Artifact generator:** Docker Compose, runtime config, Terraform, policies,
+  migration plan, or evidence report.
+- **Validator:** security, schema, provider, model compatibility, capacity, or
+  governance evidence.
+
+A discovery plugin may report facts. It must not mutate source infrastructure.
+A generator may produce proposed files. It must not apply them.
+
+## Reference RAG Runtime
+
+```mermaid
+flowchart LR
+    CLIENT["CLI or web client"] --> API["Private API"]
+    API --> AUTH["Authentication and RBAC"]
+    AUTH --> RETRIEVAL["RAG orchestration"]
+    RETRIEVAL --> VECTOR[("Vector database")]
+    RETRIEVAL --> MODEL["Local model runtime"]
+    RETRIEVAL --> ANSWER["Answer with citations"]
+    AUTH --> AUDIT[("Audit store")]
+    RETRIEVAL --> AUDIT
+```
+
+The first runtime target should use Docker Compose so a developer or small
+business can run it without Kubernetes. Candidate components remain FastAPI,
+Qdrant, Ollama, and Postgres, but implementation and testing decide the final
+defaults.
+
+## Optional Knowledge And Optimization Layer
+
+After the cited RAG path and its permissions are stable, the project may add:
+
+- An LLM-maintained Markdown wiki derived from immutable approved sources
+- A review queue for generated knowledge changes
+- Source provenance, access inheritance, contradiction, and freshness checks
+- Read-only MCP tools for approved coding agents
+- Database-native vector compression after retrieval benchmarks
+- Runtime-native KV-cache optimization after capability checks
+
+Knowledge memory and compute memory are separate concerns. The complete
+contract, support snapshot, schema proposal, and acceptance criteria are in
+[Knowledge Workspace And Memory Optimization](knowledge-workspace-and-memory-optimization.md).
+
+## Hybrid Gateway Patterns
+
+There are two different privacy patterns and the blueprint must not confuse
+them.
+
+### Cloud-Relayed Data Plane
 
 ```text
 Remote user
-  -> Cloud gateway
-  -> Auth, rate limits, admin shell, audit forwarding
-  -> Secure tunnel or VPN
-  -> Private AI server
-  -> Vector DB, local LLM, company data, audit store
+  -> cloud edge, identity, WAF, and API gateway
+  -> private connection
+  -> on-premises ingress and admission control
+  -> private RAG and model runtime
 ```
 
-The gateway must not become the system of record for private documents, embeddings, prompts, or responses unless the company explicitly approves that design.
+Prompts and responses transit the cloud gateway. Documents, embeddings, model
+weights, vector storage, and retained sensitive logs may remain on-premises.
+Cloud payload logging must be disabled or explicitly approved.
 
-## Data Flow
+### Cloud-Managed Control Plane
 
-1. A data owner approves a folder, repository, database, or log source.
-2. The ingestion job scans only approved paths.
-3. Files are filtered for denied extensions, secrets, and unsupported content.
-4. Documents are chunked and tagged with metadata.
-5. Embeddings are generated inside the trusted environment.
-6. Vectors and metadata are stored in the vector database.
-7. A user query is checked against RBAC.
-8. Retrieval only searches collections allowed for that role.
-9. The answer is generated from retrieved context.
-10. Citations and audit events are returned.
+```text
+Cloud identity, policy, and monitoring
+  -> authorizes private access
 
-## Audit Flow
+Remote user
+  -> VPN or zero-trust private data path
+  -> on-premises ingress
+  -> private RAG and model runtime
+```
 
-Every sensitive operation should write an audit event:
+This pattern can keep request payloads off a managed cloud proxy while still
+using cloud identity and management services. The selected design depends on
+latency, remote access, residency, and security requirements.
 
-- Setup wizard answers
-- Config generation
-- Validation results
-- Apply attempts
-- Login and logout
-- Ingestion start, finish, failure, and skipped files
-- Retrieval query hash
-- Collections searched
-- Model used
-- Admin changes
-- Remote access changes
+## Trust Boundaries
 
-Audit records should avoid storing raw secrets. Query text may need hashing or redaction depending on company policy.
+The main boundaries are:
 
-## Recommended Technology Defaults
+- User device to cloud or private ingress
+- Cloud gateway to private network
+- Application to source connectors
+- Application to vector database
+- Application to model runtime
+- Control plane to data plane
+- Discovery process to provider API
+- Generator to apply adapter
+- Runtime to audit and telemetry destinations
 
-| Area | MVP default | Later options |
-| --- | --- | --- |
-| Backend | FastAPI | Service mesh, background workers |
-| UI | Streamlit | React |
-| Vector DB | Qdrant or Chroma | Milvus, pgvector |
-| Local LLM | Ollama | vLLM, NVIDIA NIM |
-| Embeddings | Sentence Transformers or BGE | Enterprise embedding service |
-| Audit | Postgres | Immutable export, SIEM forwarding |
-| Deployment | Docker Compose | Ansible, Kubernetes, Terraform |
-| Auth | Local session/JWT | OAuth, SSO, LDAP, Active Directory |
+Each boundary needs an owner, allowed data classes, authentication method,
+network rule, logging policy, and failure behavior.
+
+## Data And Request Flow
+
+1. A data owner approves a source.
+2. Ingestion scans only approved paths.
+3. Denied files and secret-like content are rejected or quarantined.
+4. Documents are chunked and tagged with ownership and access metadata.
+5. Embeddings are generated in the approved processing location.
+6. Vectors and metadata are stored in the approved storage location.
+7. A user query is authenticated and checked against RBAC.
+8. Retrieval searches only collections allowed for that identity.
+9. The model receives only approved retrieved context.
+10. The answer includes citations and appropriate refusal behavior.
+11. Redacted audit events are written to approved destinations.
+
+## Discovery Architecture
+
+Cloud discovery is read-only and scope-limited:
+
+```text
+Preflight permission manifest
+  -> customer-controlled temporary credentials
+  -> provider-specific API client
+  -> allowlisted resource types and fields
+  -> redaction
+  -> discovery snapshot with provenance
+```
+
+The first planned cloud scope is selected Azure OpenAI deployment metadata, not
+a complete Azure subscription inventory. AWS Bedrock and other plugins should
+be separate milestones.
+
+## Apply And Migration Safety
+
+The architecture must enforce separation between:
+
+- Discover and mutate
+- Generate and apply
+- Validate and approve
+- Verify and cut over
+- Framework-aware evidence and legal compliance determination
+
+Production traffic management requires tested health checks, admission control,
+capacity limits, quality thresholds, traffic splitting, fallback triggers, and
+rollback. It belongs after the local runtime, target profile, and provider
+integration are proven.
 
 ## Architecture Rules
 
-- The LLM runtime must not be exposed directly to the public internet.
-- Retrieval must enforce role and collection permissions before context is passed to the model.
-- The application must not ingest denied paths or secret files.
-- Production mode must require audit logging.
-- Remote access must require network review.
-- Cyber analyst mode must remain read-only in v1.
-- Dry-run mode must not mutate infrastructure or ingest real company data.
+- The current implementation must describe generated files as proposed.
+- Model runtimes and databases must not be exposed directly to the internet.
+- Retrieval must enforce identity and collection permissions before model use.
+- Discovery credentials must be least-privilege and must not be persisted.
+- Provider discovery must not read prompt or response content by default.
+- Storage, processing, and transit locations must be represented separately.
+- Production mode must require audit logging and named owners.
+- Unknown critical answers must block apply.
+- Compliance reports must never claim certification.
+- Generated wiki pages must remain derived, cited, permission-scoped, and
+  invalidated when their sources change.
+- Lossy vector or KV-cache compression must remain disabled until a
+  target-specific benchmark passes.
+- Every apply action must require explicit approval and support verification.
+- Migration cutover must have documented rollback criteria.
 
+## Primary Architecture References
+
+- [NVIDIA DGX Spark User Guide](https://docs.nvidia.com/dgx/dgx-spark/index.html)
+- [AWS API Gateway private integrations](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html)
+- [AWS Site-to-Site VPN architecture](https://docs.aws.amazon.com/vpn/latest/s2svpn/how_it_works.html)
+- [Azure API Management self-hosted gateway](https://learn.microsoft.com/azure/api-management/self-hosted-gateway-overview)
+- [Azure VPN Gateway](https://learn.microsoft.com/azure/vpn-gateway/vpn-gateway-about-vpngateways)

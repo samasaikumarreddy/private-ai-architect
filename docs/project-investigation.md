@@ -1,162 +1,140 @@
 # Project Investigation
 
-Date: 2026-06-26
+Last updated: 2026-06-27
 
-This file records the current state of the workspace and the documentation decisions made during the first investigation pass.
+This file records the verified repository state and the product decisions made
+during the documentation and implementation investigation.
 
-## Workspace Inventory
+## Product Finding
 
-Current files:
-
-```text
-.gitignore
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
-LICENSE
-Makefile
-NOTICE
-README.md
-README_private_ai_infra_blueprint.md
-SECURITY.md
-pyproject.toml
-docs/
-  architecture.md
-  cli-reference.md
-  configuration-reference.md
-  deployment-modes.md
-  dry-run-mode.md
-  developer-workflow.md
-  github-growth-strategy.md
-  hardware-and-runtime-options.md
-  launch-checklist.md
-  mvp-scope.md
-  open-source-mission.md
-  project-investigation.md
-  roadmap.md
-  security-principles.md
-  stakeholder-workflow.md
-  threat-model.md
-  vision.md
-generated/
-  .gitkeep
-configs/
-  examples/
-    audit-policy.example.yaml
-    data-sources.example.yaml
-    model-config.example.yaml
-    rag-config.example.yaml
-    rbac.example.yaml
-examples/
-  README.md
-  sample-company-docs/
-  sample-cyber-logs/
-src/
-  private_ai_infra/
-    __init__.py
-    __main__.py
-    cli.py
-    doctor.py
-    generator.py
-    models.py
-    validator.py
-tests/
-  __init__.py
-  test_cli.py
-  test_generator_validator.py
-  test_models.py
-```
-
-The workspace is not currently a git repository.
-
-## Current State
-
-The project now has documentation plus a first Python CLI milestone. It can generate and validate a dry-run review pack, and it has unit tests.
-
-There is still no application runtime, Docker image, real local RAG ingestion, vector database write path, model inference path, web UI, or production apply flow.
-
-The original file, `README_private_ai_infra_blueprint.md`, is a strong long-form concept document. It defines the product direction, modes, stakeholder roles, safety expectations, and roadmap. The main problem was that it described a documentation tree that did not exist.
-
-## Documentation Work Completed
-
-The long blueprint was converted into a navigable documentation set:
-
-- `README.md` now acts as the canonical entry point.
-- `docs/open-source-mission.md` defines the GitHub/open-source positioning and contribution boundaries.
-- `docs/github-growth-strategy.md` defines the 10k-star growth strategy and the product signals needed to earn it.
-- `docs/launch-checklist.md` defines what must exist before GitHub setup, first public push, and serious launch.
-- `docs/cli-reference.md` defines the implemented v0.1 CLI behavior.
-- `docs/developer-workflow.md` defines local install, test, dry-run, validation, and contribution workflow.
-- `docs/vision.md` defines the problem, target users, success criteria, and non-goals.
-- `docs/architecture.md` defines components, data flow, trust boundaries, audit flow, and architecture rules.
-- `docs/deployment-modes.md` defines mode-specific assumptions, outputs, and validation blockers.
-- `docs/hardware-and-runtime-options.md` defines CPU, GPU, DGX Spark, DGX-class, runtime, and vector database paths without hardcoding fast-changing hardware specs.
-- `docs/dry-run-mode.md` defines dry-run guarantees, outputs, review gates, and promotion to apply.
-- `docs/stakeholder-workflow.md` defines role-specific questions and generated artifacts.
-- `docs/security-principles.md` defines defaults, RBAC, audit policy, prompt-injection handling, data protection, network safety, and cyber mode limits.
-- `docs/threat-model.md` defines assets, actors, trust boundaries, threats, mitigations, abuse cases, and residual risks.
-- `docs/configuration-reference.md` defines planned generated files, example config shapes, and validation rules.
-- `docs/mvp-scope.md` defines MVP in-scope work, out-of-scope work, milestones, acceptance criteria, and test targets.
-- `docs/roadmap.md` defines phased delivery.
-
-## Key Finding
-
-The project should not start by building the full enterprise platform. The lowest-risk implementation path is:
+The project is not primarily another local chat interface. Its intended product
+is a guided private-AI architect:
 
 ```text
-CLI wizard
-  -> dry-run files
-  -> validator
-  -> local Docker Compose stack
-  -> sample ingestion
-  -> cited local chat
-  -> audit log
+workflow-specific questions
+  + narrow approved discovery
+  -> normalized blueprint
+  -> proposed artifacts
+  -> validation
+  -> human review
+  -> future apply and verification
+  -> future staged migration and evidence
 ```
 
-Hybrid cloud, SSO, Kubernetes, Terraform, SIEM export, and enterprise integrations should remain later phases.
+The local RAG stack is the first reference target. It proves that generated
+runtime configuration can produce a useful cited answer. Private GPU hardware
+and cloud migration paths come after that proof.
 
-The first CLI step is now implemented as a non-mutating dry-run generator.
+## Primary Workflows
 
-## Immediate Implementation Gaps
+1. A developer builds local RAG using a CPU, RTX GPU, or approved company GPU
+   endpoint.
+2. A small business configures newly purchased DGX Spark or generic private GPU
+   hardware.
+3. A cloud-integrated company assesses and migrates a selected Azure OpenAI or
+   AWS Bedrock workload while retaining approved identity, gateway, and
+   monitoring services.
 
-Before the local RAG MVP starts, the project still needs these decisions:
+The questionnaire must branch immediately so users do not receive irrelevant
+questions.
 
-- Default vector database: Qdrant or Chroma
-- Default local model runtime: Ollama or vLLM
-- MVP UI choice confirmation: Streamlit first, React later
-- Audit storage choice: Postgres only or file-based dev mode plus Postgres
+## Verified Repository State
 
-Decisions already made for v0.1:
+The repository is a local Git repository on branch `main` with three baseline
+commits created before this documentation revision.
 
-- Package name: `private-ai-infra-blueprint`
-- Python package import: `private_ai_infra`
-- CLI entry point: `private-ai`
-- License: Apache 2.0
-- Initial default vector database: Qdrant
-- Initial local runtime default: Ollama
-- Generated runtime output: ignored under `generated/*` except `.gitkeep`
+Implemented:
 
-## Verification Performed
+- Python package and `private-ai` command
+- Dry-run review-pack generation
+- Machine-readable dry-run answers and summary
+- Configuration validation
+- Local environment readiness checks
+- Deployment-mode listing
+- Local JSON document indexing
+- Retrieval-only search with cited excerpts
+- Denied-file and likely-secret filtering
+- Synthetic sample documents and logs
+- Unit tests and GitHub Actions CI
+- Apache 2.0 license and community governance files
 
-- Created the planned documentation tree.
-- Added GitHub-ready open-source files: `LICENSE`, `NOTICE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.gitignore`, issue templates, and a pull request template.
-- Added a Python package skeleton and first CLI implementation.
-- Added tests for modes, generation, validation, and CLI behavior.
-- Added machine-readable dry-run metadata: `answers.json` and `dry-run-summary.json`.
-- Added optional interactive dry-run prompts and `private-ai modes`.
-- Added retrieval-only local indexing and cited query preview through `private-ai ingest` and `private-ai chat`.
-- Added committed example configs and safe synthetic sample docs/logs.
-- Added GitHub Actions CI and a Makefile.
-- Checked local Markdown links from `README.md`.
-- Checked Markdown code fences for balance.
-- Confirmed every docs page has a top-level H1 heading.
-- Confirmed newly added documentation is ASCII-only.
+Not implemented:
 
-Runtime verification:
+- Normalized blueprint schema
+- Complete branching question graph
+- Docker RAG runtime
+- Vector database writes and embeddings
+- Local model inference
+- Model-generated cited answers
+- Runtime RBAC and audit store
+- Cloud provider discovery
+- Hardware-verified DGX Spark target
+- Infrastructure apply, verification, shadowing, cutover, or rollback
 
-- `python -m unittest discover -s tests -v` passed.
-- `python -m private_ai_infra init --dry-run --mode local-developer --project-name smoke-test --company-name local --output-dir generated/dry-run --force` passed.
-- `python -m private_ai_infra validate generated/dry-run` passed.
-- `python -m private_ai_infra doctor` ran and reported local environment checks.
-- `private-ai modes` passed.
-- `private-ai ingest examples/sample-company-docs --collection docs --output-dir generated/index --force` passed.
-- `private-ai chat "AI usage rules" --index generated/index/index.json` passed.
+No public GitHub repository or remote has been confirmed.
+
+## Documentation Decisions
+
+- `README.md` is the canonical entry point.
+- `docs/vision.md` defines the guided architect product.
+- `docs/guided-architect-workflow.md` defines the three user journeys and
+  controlled lifecycle.
+- `docs/architecture.md` separates question, discovery, blueprint, generation,
+  validation, apply, verification, and evidence layers.
+- `docs/configuration-reference.md` proposes the normalized blueprint and
+  governance model.
+- `docs/deployment-modes.md` separates workflow intent from deployment target.
+- `docs/mvp-scope.md` keeps the first runtime proof to local RAG.
+- `docs/roadmap.md` gives discovery, hardware targets, and production traffic
+  migration separate releases.
+- `docs/security-principles.md` and `docs/threat-model.md` cover cloud transit,
+  discovery credentials, GPU exhaustion, migration safety, and false compliance
+  assurance.
+
+The original `README_private_ai_infra_blueprint.md` remains a historical concept
+document. Current scope and sequencing come from the canonical README and
+`docs/`.
+
+## Key Engineering Boundaries
+
+- Discovery is provider-specific, read-only, and scope-limited.
+- The first cloud scope is selected Azure OpenAI deployment metadata, not a
+  complete subscription inventory.
+- Unknown facts remain unresolved rather than guessed.
+- Storage, processing, transit, logging, and telemetry locations are distinct.
+- A framework label activates advisory checks; it does not certify compliance.
+- DGX Spark configurations require ARM64 and model/runtime compatibility tests.
+- Cloud WAF protection does not replace private ingress admission control.
+- Production shadowing, canary, and rollback come after the target and provider
+  paths are proven.
+
+## Immediate Build Priority
+
+The next implementation should remain:
+
+```text
+local developer questions
+  -> local blueprint
+  -> Docker Compose
+  -> approved sample ingestion
+  -> embeddings and vector retrieval
+  -> local model answer with citations
+  -> refusal and audit tests
+```
+
+Cloud discovery and migration work should not begin by weakening or skipping
+this reference implementation.
+
+## Previous Verification
+
+Before this documentation revision:
+
+- `python -m unittest discover -s tests -v` passed 13 tests.
+- Dry-run generation and validation passed.
+- `private-ai doctor` completed.
+- Sample document ingestion completed.
+- Retrieval-only cited search completed.
+- Markdown links, code fences, and ASCII checks passed.
+
+Documentation-only changes in this revision require fresh Markdown and link
+validation but do not change runtime behavior.

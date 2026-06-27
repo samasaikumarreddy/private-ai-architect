@@ -1,5 +1,13 @@
 # Private AI Infrastructure Blueprint
 
+> **Historical concept document:** This was the original long-form project
+> proposal. The canonical product definition, current status, scope, and
+> sequencing now live in [README.md](README.md) and the [docs](docs/) folder.
+> In particular, see
+> [Guided Architect Workflow](docs/guided-architect-workflow.md) and
+> [Roadmap](docs/roadmap.md). Where this document conflicts with those files,
+> the canonical documentation takes precedence.
+
 > Documentation status: this original long-form blueprint has been split into the canonical project README and focused docs under `docs/`. Keep this file as the source blueprint/history, and use `README.md` as the entry point for readers.
 
 A guided, role-based, security-first reference architecture for deploying private company AI systems such as RAG assistants, developer assistants, and SOC/cyber analyst assistants on local Linux machines, GPU servers, DGX-class hardware, or hybrid cloud/on-prem environments.

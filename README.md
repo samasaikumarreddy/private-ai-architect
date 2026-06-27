@@ -1,12 +1,33 @@
 # Private AI Infrastructure Blueprint
 
-Status: early open-source blueprint with a working dry-run CLI. Local RAG runtime is not implemented yet.
+Status: early open-source guided architect with a working dry-run CLI and
+retrieval preview. The local RAG runtime, hardware deployment, and cloud
+migration paths are not implemented yet.
 
-Build and deploy private AI systems for developer workspaces, company documents, RAG assistants, GPU servers, DGX Spark, and enterprise environments without sending sensitive data to public AI tools by default.
+Plan, generate, validate, and eventually migrate private AI systems across
+developer machines, GPU servers, DGX Spark, and hybrid cloud environments.
 
-This repository defines a security-first reference architecture for deploying private AI inside a trusted company environment. It is designed for developers, small companies, and enterprise teams that want practical AI integration without guessing through data privacy, networking, RBAC, audit logging, model runtime, and deployment decisions.
+Private AI Infrastructure Blueprint is an open-source guided architect. It asks
+workflow-specific questions, records unknown decisions instead of guessing,
+builds a normalized blueprint, generates proposed configuration and migration
+artifacts, validates known risks, and produces evidence for human review.
 
-The project started documentation-led, and now includes the first usable CLI milestone: `private-ai init --dry-run` generates a review pack without applying infrastructure changes.
+The product supports three journeys:
+
+1. Build local RAG with a CPU, RTX GPU, or approved company GPU endpoint.
+2. Configure newly purchased private hardware such as DGX Spark or a generic
+   NVIDIA GPU server.
+3. Migrate selected Azure OpenAI or AWS Bedrock workloads to private
+   infrastructure while retaining useful cloud identity, gateway, and
+   monitoring services.
+
+The project started documentation-led and now includes its first usable CLI
+milestone: `private-ai init --dry-run` generates a proposed review pack without
+applying infrastructure changes.
+
+**New to private AI?** Start with the [Beginner's Guide](docs/beginner-guide.md).
+It uses simple explanations and diagrams to show what works today and what the
+project will build next.
 
 ## Why Star This Project
 
@@ -15,10 +36,12 @@ Star this repo if you want an open-source path for:
 - Adding AI to a developer workspace without exposing private files.
 - Building RAG over approved company documents.
 - Running local AI with Ollama, vLLM, NVIDIA NIM, or similar runtimes.
-- Planning GPU server, DGX Spark, or DGX-class deployments.
+- Integrating GPU servers or DGX Spark through guided compatibility,
+  networking, identity, and operations questions.
+- Planning staged cloud-to-private AI migration with verification and rollback.
 - Generating dry-run configs before touching real infrastructure.
 - Adding RBAC, audit logs, and safe ingestion from day one.
-- Helping build a vendor-neutral private AI deployment blueprint.
+- Helping build a provider-neutral blueprint and plugin ecosystem.
 
 The 10k-star goal is not cosmetic. It means enough developers care about private, useful, security-aware AI infrastructure that the ecosystem can grow around it.
 
@@ -28,8 +51,10 @@ The goal is to help developers and companies integrate AI into real workspaces s
 
 - A developer should be able to test private AI over approved local files.
 - A small company should be able to run a private document assistant without enterprise hardware.
-- A GPU workstation or DGX Spark user should have a clearer path to a stronger local AI deployment.
-- An enterprise team should have reviewable architecture, security, networking, and audit documentation before production.
+- A small business with new GPU hardware should receive a guided integration
+  and verification plan.
+- An enterprise team should be able to assess one approved cloud AI workload
+  and generate a reviewable migration and rollback plan.
 
 This should become a practical open-source starting point, not a vendor-locked demo.
 
@@ -40,20 +65,36 @@ This should become a practical open-source starting point, not a vendor-locked d
 - Startups and small companies that need private document search.
 - Security teams reviewing AI before company rollout.
 - Infra teams deploying on GPU servers or DGX-class hardware.
+- Cloud teams moving selected Azure OpenAI or AWS Bedrock workloads.
 - AI engineers choosing model, embedding, and retrieval architecture.
 - Open-source contributors who want private AI to be easier and safer.
 
 ## What This Project Is
 
-Private AI Infrastructure Blueprint is a guided deployment plan for private AI systems across:
+Private AI Infrastructure Blueprint is a guided architecture and migration
+system for:
 
-- Local developer machines
-- Small company servers
-- GPU workstations or DGX-class systems
-- Hybrid cloud gateway patterns
-- Dry-run planning-only environments
+- Local private RAG
+- Small-company GPU integration
+- Generic NVIDIA GPU servers
+- DGX Spark and later DGX-class targets
+- Hybrid cloud/private architecture
+- Staged migration from supported cloud AI providers
 
-The intended product is a CLI and application stack that can ask role-specific setup questions, generate deployment configs, validate risky settings, run a local RAG system, and keep audit evidence for sensitive operations.
+The intended product lifecycle is:
+
+```text
+choose workflow
+  -> answer relevant questions
+  -> optional narrow read-only discovery
+  -> normalized blueprint
+  -> generate
+  -> validate
+  -> human review
+  -> apply
+  -> verify
+  -> controlled migration and evidence
+```
 
 Current implementation:
 
@@ -72,11 +113,14 @@ Current implementation:
 
 Not implemented yet:
 
+- Normalized blueprint and complete branching questionnaire
 - Real Docker images
 - Vector database writes
 - Model inference
 - Web UI
-- `apply` and `audit`
+- Cloud provider discovery
+- Hardware-verified DGX Spark profile
+- `apply`, verification, shadowing, and cutover
 
 ## Quickstart
 
@@ -137,6 +181,10 @@ Dry-run output is written under `generated/dry-run/` and is intentionally ignore
 - Human approval for risky actions
 - Audit every sensitive action
 - No direct internet exposure of model runtimes
+- Narrow, read-only provider discovery
+- Storage, processing, and cloud transit modeled separately
+- No compliance certification claims
+- Verification and rollback before production cutover
 
 ## MVP Target
 
@@ -155,20 +203,24 @@ User
 
 MVP capabilities:
 
-- Guided setup wizard
+- Local developer question branch
 - Dry-run mode that generates plans but applies nothing
 - Docker Compose local deployment
 - Local document ingestion from approved paths
 - RAG Q&A with citations
-- YAML-based RBAC
-- Audit logging
-- Basic admin/config summary
-- Read-only developer assistant mode
-- Read-only cyber log summarizer over sample logs
+- Refusal when evidence is missing
+- Basic collection permissions
+- Redacted local audit events
+- Automated CPU and documented RTX smoke tests
+
+Cloud discovery, DGX Spark verification, hybrid gateways, and production
+cutover are later milestones. See the [Roadmap](docs/roadmap.md).
 
 ## Documentation Map
 
+- [Beginner's Guide](docs/beginner-guide.md)
 - [Vision](docs/vision.md)
+- [Guided Architect Workflow](docs/guided-architect-workflow.md)
 - [Open-Source Mission](docs/open-source-mission.md)
 - [GitHub Growth Strategy](docs/github-growth-strategy.md)
 - [Launch Checklist](docs/launch-checklist.md)
@@ -176,6 +228,7 @@ MVP capabilities:
 - [Developer Workflow](docs/developer-workflow.md)
 - [Project Investigation](docs/project-investigation.md)
 - [Architecture](docs/architecture.md)
+- [Knowledge Workspace And Memory Optimization](docs/knowledge-workspace-and-memory-optimization.md)
 - [Deployment Modes](docs/deployment-modes.md)
 - [Hardware And Runtime Options](docs/hardware-and-runtime-options.md)
 - [Dry-Run Mode](docs/dry-run-mode.md)
@@ -208,7 +261,8 @@ private-ai apply
 private-ai audit
 ```
 
-No production-impacting command should run before validation passes.
+No production-impacting command should run before validation, review, and
+approval of the exact blueprint revision.
 
 ## Launch Readiness
 

@@ -1,22 +1,28 @@
 # Stakeholder Workflow
 
-Private AI deployments fail when a single person guesses what every stakeholder needs. The setup wizard should guide each role through the decisions they own and generate artifacts that can be reviewed before deployment.
+Private AI deployments fail when a single person guesses what every stakeholder needs. The guided architect should first select the user's workflow, then ask each relevant role only the decisions they own and generate artifacts that can be reviewed before deployment.
 
 ## Workflow Overview
 
-```text
-Manager
-  -> Developer
-  -> Network Engineer
-  -> Security Engineer
-  -> Data Engineer
-  -> AI Engineer
-  -> Review Board or Approver
-  -> Validate
-  -> Apply
+```mermaid
+flowchart TD
+    INTENT["Select workflow intent"] --> LOCAL["Local RAG"]
+    INTENT --> HARDWARE["New private hardware"]
+    INTENT --> MIGRATION["Cloud migration"]
+
+    LOCAL --> ROLES["Relevant domain questions"]
+    HARDWARE --> ROLES
+    MIGRATION --> ROLES
+
+    ROLES --> BLUEPRINT["Normalized blueprint"]
+    BLUEPRINT --> VALIDATE["Validate"]
+    VALIDATE --> APPROVERS["Domain-owner review"]
+    APPROVERS --> APPLY["Apply only when supported and approved"]
 ```
 
-The same person may fill multiple roles in a small company, but the questions should remain separate.
+The same person may fill multiple roles in a small company, but ownership and
+questions should remain separate. Local users should not see irrelevant cloud
+or enterprise questions.
 
 ## Manager / Business Owner
 
@@ -151,6 +157,54 @@ Outputs:
 - `embedding-config.yaml`
 - `eval-plan.md`
 
+## Privacy, Legal, And Compliance Reviewer
+
+Owns framework applicability and evidence requirements. The tool supports this
+review but does not determine legal compliance.
+
+Questions:
+
+- Which jurisdictions and contractual obligations apply?
+- Which data classifications are in scope?
+- Where may data be stored, processed, and transmitted?
+- May prompts or responses transit a managed cloud gateway?
+- Which retention, deletion, and access evidence is required?
+- Is a privacy or data-protection impact assessment required?
+- Which controls require organizational or physical evidence outside the tool?
+- Who is authorized to accept unresolved compliance risk?
+
+Outputs:
+
+- `governance-requirements.yaml`
+- `data-flow-and-residency.md`
+- `human-evidence-checklist.md`
+- `privacy-review.md`
+
+Framework selections must be marked `unverified` until an authorized reviewer
+confirms applicability. Generated reports must not claim certification.
+
+## Migration Owner
+
+Owns source workload scope, acceptance criteria, cutover, and rollback.
+
+Questions:
+
+- Which exact cloud AI workload is being migrated?
+- Which applications and API behaviors depend on it?
+- What quality, latency, throughput, and availability must be preserved?
+- Is shadow comparison required?
+- What conditions permit or stop a canary?
+- What triggers immediate rollback?
+- Who may change production traffic?
+
+Outputs:
+
+- `source-scope.md`
+- `compatibility-report.md`
+- `migration-plan.md`
+- `verification-plan.md`
+- `rollback-plan.md`
+
 ## Handoff Rules
 
 - Every generated artifact must list its owner.
@@ -159,4 +213,8 @@ Outputs:
 - Optional warnings should be visible in the validation report.
 - A single approver can approve only the domains they own.
 - Production deployment requires business, security, network, and data approval.
-
+- Compliance framework labels activate questions and evidence checks but never
+  create an automatic compliance approval.
+- Cloud discovery must use a separately approved read-only permission scope.
+- Production cutover requires an approved blueprint revision, acceptance
+  criteria, named operators, and rollback criteria.

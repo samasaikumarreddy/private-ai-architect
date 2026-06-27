@@ -4,7 +4,7 @@ This checklist defines what should exist before promoting the repository widely.
 
 ## Current Stage
 
-Current stage: first dry-run CLI milestone.
+Current stage: v0.1 safe planning foundation and retrieval preview.
 
 The project is not ready for a broad local RAG launch yet because ingestion, model inference, Docker images, and the UI are not implemented. It is ready to be shared as an early blueprint with a working dry-run CLI if the messaging is honest.
 
@@ -13,6 +13,8 @@ The project is not ready for a broad local RAG launch yet because ingestion, mod
 - [x] Canonical README
 - [x] Documentation map
 - [x] Open-source mission
+- [x] Guided architect workflow
+- [x] Normalized blueprint proposal
 - [x] Architecture docs
 - [x] Deployment modes
 - [x] Hardware/runtime options
@@ -42,8 +44,8 @@ The project is not ready for a broad local RAG launch yet because ingestion, mod
 - [x] Safe sample docs and sample cyber logs
 - [x] GitHub Actions CI
 - [x] Makefile for common local commands
-- [ ] Git repository initialized
-- [ ] First commit created
+- [x] Git repository initialized
+- [x] Baseline commits created
 - [ ] GitHub repository created
 - [ ] Repository description set
 - [ ] Repository topics set
@@ -87,18 +89,17 @@ These should exist before asking large communities to try the project:
 Use this structure:
 
 ```text
-I am building an open-source private AI infrastructure blueprint for devs and companies that want local AI, RAG over approved docs, GPU/DGX deployments, RBAC, audit logs, and dry-run planning before touching real infrastructure.
+I am building an open-source guided architect for private AI.
 
-The repo starts as a docs-first blueprint and is moving toward a CLI plus local RAG MVP.
+It asks workflow-specific questions, generates and validates a versioned
+blueprint, and is designed to support:
+- local RAG on CPU or RTX
+- new GPU and DGX Spark integration
+- staged Azure OpenAI and AWS Bedrock migration
 
-Looking for contributors interested in:
-- local AI
-- RAG
-- FastAPI
-- Ollama/vLLM/NVIDIA NIM
-- Qdrant/Chroma
-- security validation
-- developer tooling
+The current release has safe dry-run generation and a retrieval preview. The
+next milestone is a working local RAG reference with cited answers. Cloud
+discovery and production migration are later, separately tested stages.
 
 Repo: <link>
 ```
@@ -110,19 +111,19 @@ Repo: <link>
 | 100 stars | README and docs resonate with early builders. |
 | 500 stars | Dry-run CLI exists and people can generate useful artifacts. |
 | 1,000 stars | Local RAG MVP runs from clone to cited answer. |
-| 2,500 stars | Contributors add integrations and examples. |
-| 5,000 stars | Project has demos, issues, docs, and visible adoption. |
-| 10,000 stars | Project is a known starting point for private AI infrastructure. |
+| 2,500 stars | A generic GPU and DGX Spark profile have reproducible target tests. |
+| 5,000 stars | One narrow cloud migration path is demonstrated in a test environment. |
+| 10,000 stars | The project is a trusted guided architect with active provider and target contributors. |
 
 ## First Issues To Create
 
 - Build Python package skeleton
 - Add CLI entry point
-- Add dry-run answer schema
-- Add manager wizard questions
-- Add developer wizard questions
-- Add security wizard questions
-- Add network wizard questions
+- Add versioned blueprint schema
+- Add workflow intent question graph
+- Add local developer question branch
+- Add private hardware question branch
+- Add cloud migration question branch
 - Add RBAC config schema
 - Add data-source config schema
 - Add dry-run report generator
@@ -131,13 +132,17 @@ Repo: <link>
 - Add example Qdrant Docker Compose service
 - Add example Ollama runtime profile
 - Add sample company documents
+- Add unresolved-decision validation
+- Define Azure OpenAI discovery permission manifest
+- Define DGX Spark ARM64 compatibility test matrix
 
 ## Launch Risk
 
 The biggest risk is overclaiming. The project should be explicit:
 
-- Blueprint and dry-run CLI now
-- Local RAG MVP after that
-- Enterprise features later
+- Dry-run and retrieval preview now
+- Working local RAG next
+- Guided blueprint and verified hardware profiles after that
+- Narrow provider discovery and migration later
 
 Credibility matters more than speed.

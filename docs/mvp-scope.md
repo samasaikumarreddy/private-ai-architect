@@ -1,122 +1,133 @@
 # MVP Scope
 
-The MVP should prove that the project can safely guide a private local RAG deployment from planning to operation.
+The MVP is the working local RAG reference deployment. It proves that the
+project can move from guided planning to a useful, private, cited answer without
+claiming cloud migration or production readiness.
+
+This runtime is not the whole product. It is the first target generated and
+validated by the guided architect.
+
+## Primary User
+
+A developer with:
+
+- Python 3.11 or newer
+- Docker
+- A CPU or supported RTX-class GPU
+- Synthetic sample documents or explicitly approved local files
+- No requirement for DGX hardware or cloud credentials
 
 ## In Scope
 
-- CLI setup wizard
-- Dry-run generation
-- Validation command
-- Docker Compose local deployment
-- FastAPI backend
-- Streamlit UI
-- Local auth or simple session auth
-- YAML RBAC
-- Local folder ingestion
+- Local developer question branch
+- Dry-run generation and validation
+- Docker Compose reference stack
+- Private API
+- Ollama model runtime
+- Qdrant vector storage
+- Approved local-folder ingestion
 - Secret and denied-path filtering
-- Qdrant or Chroma vector storage
-- Ollama or vLLM local model runtime
-- RAG Q&A with citations
-- Postgres audit log
-- Basic admin/config summary
+- Model-generated RAG answers with citations
+- Refusal when sources do not support an answer
+- Localhost-only defaults
+- Basic collection permissions
+- Local audit events
 - Sample company documents
-- Sample cyber logs
-- Read-only cyber log summarization
-- Read-only developer assistant over approved docs
+- Automated installation and smoke tests
 
-## Out Of Scope For MVP
+The implementation may choose equivalent components when testing reveals a
+clear technical reason, but the user-visible acceptance criteria must remain.
 
-- Autonomous remediation
-- Public SaaS hosting
+## Out Of Scope
+
+- DGX Spark verification
+- Cloud provider discovery
+- Azure or AWS infrastructure generation
+- Production traffic shadowing or canary cutover
+- Automatic rollback
 - Kubernetes
-- Terraform
-- Full SSO/LDAP/Active Directory
+- Enterprise SSO, LDAP, or Active Directory
 - Multi-tenant hosted control plane
-- Production compliance certification
-- Direct shell execution from cyber mode
-- Automatic code modification in developer mode
-- Ingesting arbitrary machine-wide folders
-- Storing real secrets
+- Compliance certification
+- Autonomous remediation
+- Arbitrary machine-wide ingestion
+- Storing real credentials
+- Public model or database exposure
 
 ## Implementation Milestones
 
-1. Project skeleton and packaging - started
-2. CLI command shell - started
-3. Wizard questions and answer model - started
-4. Dry-run generators - started
-5. Config validator - started
-6. Docker Compose MVP stack
-7. Backend auth and RBAC enforcement
-8. Ingestion pipeline
-9. RAG query path with citations
-10. Audit logging
-11. Streamlit UI
-12. Sample cyber log summarizer
-13. Tests and documentation updates
+1. Preserve existing dry-run and validation behavior.
+2. Define the local branch of the normalized blueprint.
+3. Add the Docker Compose service topology.
+4. Integrate Ollama and a supported default model.
+5. Integrate Qdrant and local embeddings.
+6. Add safe ingestion into the vector store.
+7. Add grounded answer generation with citations and refusal behavior.
+8. Add local identity or session boundaries and collection checks.
+9. Add redacted audit events.
+10. Add smoke, retrieval, grounding, failure, and denied-file tests.
+11. Document supported CPU and RTX paths.
 
 ## Acceptance Criteria
 
-MVP is done when a user can:
+MVP is complete when a new user can:
 
-- Run `private-ai init --dry-run`
-- Answer setup questions for local developer mode
-- Review generated config and documentation artifacts
-- Run `private-ai validate`
-- Run `private-ai apply` only after validation passes
-- Start the Docker Compose stack
-- Ingest sample documents
-- Ask questions and get cited answers
-- See audit records for ingestion and chat
-- Confirm denied files were skipped
-- Run cyber log summarization without remediation actions
+1. Run the readiness check.
+2. Generate a local developer blueprint and proposed deployment pack.
+3. Validate the pack.
+4. Start the reference stack with one documented command.
+5. Ingest the included synthetic documents.
+6. Ask a question and receive a model-generated answer with valid citations.
+7. Ask an unsupported question and receive an appropriate refusal.
+8. Confirm denied files were not indexed.
+9. Confirm services are not publicly exposed.
+10. Inspect redacted audit events for ingestion and chat.
+11. Stop and remove the test stack without losing control of source files.
 
-## Test Coverage Targets
+## Test Requirements
 
-Minimum tests:
-
-- Wizard answer parsing
-- Dry-run output generation
-- Validation blockers
-- RBAC collection filtering
-- Denied-path ingestion filtering
-- Audit event writing
-- RAG citation formatting
-- Cyber mode action blocking
-
-## Recommended First Build Path
-
-Build the non-networked local developer path first:
-
-```text
-CLI wizard
-  -> dry-run files
-  -> validator
-  -> local Docker Compose
-  -> sample ingestion
-  -> cited chat
-  -> audit log
-```
-
-Do not build hybrid cloud gateway mode before the local private path works.
+- Question-branch selection
+- Blueprint parsing and schema validation
+- Deterministic generation
+- Unsafe bind-address blocker
+- Denied-path and secret-file filtering
+- Collection authorization
+- Vector ingestion and deletion
+- Citation source integrity
+- Unsupported-answer refusal
+- Prompt-injection test cases
+- Audit redaction
+- Clean start and stop
+- CPU smoke test
+- Documented RTX smoke test
 
 ## Current v0.1 Progress
 
 Implemented:
 
-- Python package skeleton
-- `private-ai init --dry-run`
-- Dry-run review pack generation
-- `private-ai validate`
-- `private-ai doctor`
-- `private-ai ingest` for local JSON indexing
-- `private-ai chat` for retrieval-only cited excerpts
-- Unit tests for the first CLI milestone
+- Python package and CLI
+- Dry-run review-pack generation
+- Configuration validation
+- Local readiness checks
+- Local JSON indexing
+- Retrieval-only cited excerpts
+- Denied-file patterns
+- Unit tests
 
 Not implemented:
 
-- Full role-specific interactive wizard
-- Real Docker images
+- Normalized blueprint schema
+- Full branching questionnaire
+- Docker runtime stack
 - Vector database writes
-- Local model inference
-- Web UI
-- Runtime audit log storage
+- Embedding model
+- Local LLM inference
+- Model-generated answers
+- Runtime RBAC and audit storage
+
+## Safety Gate
+
+Hybrid cloud gateway and migration automation must not delay the local MVP, but
+they also must not reuse unverified local configuration as production
+infrastructure. Every later target gets its own compatibility, security, and
+verification tests.

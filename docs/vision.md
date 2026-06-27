@@ -1,67 +1,127 @@
 # Vision
 
-Companies want AI assistants, but many teams cannot safely use public AI tools for sensitive internal information. Private AI infrastructure should let teams search and reason over approved company data while keeping data, logs, access controls, and model execution inside a trusted boundary unless a deliberate exception is approved.
+Private AI Infrastructure Blueprint is an open-source guided architect for
+private AI deployment and migration.
 
-This project defines a guided way to plan, deploy, validate, and operate private AI systems.
+It asks the questions an experienced infrastructure architect would ask,
+records unresolved decisions instead of guessing, generates reviewable
+configuration and migration artifacts, validates known risks, and eventually
+helps an approved operator deploy and verify the target system.
+
+The project does not try to replace an architect, security engineer, cloud
+engineer, or compliance reviewer. It makes their decisions explicit,
+repeatable, and easier to review.
 
 ## Problem
 
-Teams commonly run into these issues:
+Private AI projects are difficult for reasons that extend beyond running a
+model:
 
-- Sensitive files cannot be uploaded to public AI tools.
-- RAG deployments are assembled without consistent security review.
-- Networking, VPN access, firewall rules, and remote access are unclear.
-- Data permissions in source systems do not automatically map to AI retrieval permissions.
-- Small companies may not own dedicated AI hardware.
-- Developers may have approved document access but no enterprise deployment path.
-- Managers, developers, network engineers, security engineers, and data owners need different setup questions.
-- Teams need to preview deployment plans before applying infrastructure changes.
+- A small business may buy a DGX Spark or GPU server but lack a clear migration
+  and integration plan.
+- A developer may have an RTX GPU and approved company documents but no safe,
+  repeatable local RAG setup.
+- A cloud-integrated company may want to move inference from Azure OpenAI or
+  AWS Bedrock without discarding its existing identity, gateway, monitoring,
+  and security investments.
+- Source permissions do not automatically become retrieval permissions.
+- Runtime, model, network, data, identity, audit, and rollback decisions are
+  spread across different teams.
+- Broad infrastructure discovery requires sensitive credentials and varies
+  substantially between customers.
+- Production cutover requires capacity checks, traffic control, health checks,
+  fallback criteria, and human approval.
 
-## Product Idea
+Teams need a guided process that separates what can be automated from what must
+be decided and approved by people.
 
-The project should become a guided deployment system that:
+## Product Definition
 
-- Asks role-specific setup questions.
-- Produces architecture and security review artifacts.
-- Generates environment, Docker Compose, RBAC, ingestion, and network configs.
-- Supports dry-run planning before any local system changes.
-- Validates unsafe settings before apply.
-- Deploys a local/private RAG assistant for approved data.
-- Records auditable evidence of setup and usage decisions.
+> An open-source guided architect that discovers a narrowly approved scope,
+> builds a normalized private-AI blueprint, generates deployment and migration
+> artifacts, validates risks, and produces evidence for human review.
 
-## Target Users
+The guided architect has three primary workflows:
 
-- Small business owners who want private document Q&A.
-- Developers building a local proof of concept over approved files.
-- Security teams reviewing AI deployments before production.
-- Data engineers connecting approved data sources.
-- AI engineers selecting model and retrieval configuration.
-- Network engineers controlling remote access and exposure.
-- Managers approving business scope and risk ownership.
+1. **Build local RAG:** help a developer use an RTX GPU or CPU with open or
+   approved custom models over approved company data.
+2. **Configure new private hardware:** help a small business integrate a DGX
+   Spark, generic NVIDIA GPU server, or another supported target.
+3. **Migrate from cloud AI:** help a cloud-integrated company assess and
+   gradually move selected workloads from Azure OpenAI or AWS Bedrock while
+   retaining useful cloud identity, gateway, and monitoring services.
+
+These workflows share one blueprint and validation engine, but their
+questionnaires and generated artifacts must branch early. A local developer
+must not be asked enterprise VPC questions, and a cloud migration must not be
+treated like a clean local installation.
+
+## Product Responsibilities
+
+The project should:
+
+- Ask only questions relevant to the selected workflow.
+- Support unknown and unresolved answers without inventing values.
+- Perform provider-specific, read-only discovery with least-privilege
+  credentials.
+- Produce a normalized, versioned blueprint as the source of truth.
+- Generate Docker, runtime, model, network, RBAC, audit, cloud, migration, and
+  rollback artifacts when relevant.
+- Validate unsafe, incompatible, incomplete, and unreviewed choices.
+- Require explicit approval before any infrastructure mutation.
+- Verify the deployed system against the approved blueprint.
+- Produce an evidence pack containing decisions, checks, warnings, approvals,
+  and test results.
 
 ## What Success Looks Like
 
-The project is successful when a user can move from idea to reviewed local deployment without guessing:
+A user should be able to follow a controlled lifecycle:
 
-1. Choose a deployment mode.
-2. Answer role-specific setup questions.
-3. Generate a dry-run deployment pack.
-4. Review security, network, data, and model choices.
-5. Validate the generated configuration.
-6. Apply only after explicit approval.
-7. Ingest sample or approved documents.
-8. Ask questions and receive cited answers.
-9. Review audit logs for sensitive operations.
+```text
+Choose workflow
+  -> Answer relevant questions
+  -> Optionally run narrow read-only discovery
+  -> Generate normalized blueprint
+  -> Generate proposed artifacts
+  -> Validate
+  -> Review and approve
+  -> Apply with explicit permission
+  -> Verify
+  -> Migrate or cut over gradually
+  -> Export evidence
+```
+
+The first proof is smaller: a developer can generate and validate a plan, start
+a local reference RAG stack, ingest approved sample documents, and receive
+cited answers. The same blueprint model then expands to private hardware and
+cloud migration workflows.
+
+## Trust And Compliance Position
+
+The tool can generate framework-aware checks and evidence requirements. It
+cannot certify that an organization complies with GDPR, HIPAA, SOX, or any
+other legal or regulatory framework.
+
+Generated reports must distinguish:
+
+- Control detected
+- Control missing
+- Requires human evidence
+- Not evaluated
+
+Applicability remains unverified until the organization's authorized legal,
+privacy, security, and compliance reviewers confirm it.
 
 ## Non-Goals
 
 This project is not:
 
-- A replacement for security engineers.
-- A guarantee of compliance.
+- A replacement for qualified architects or reviewers.
+- A guarantee or certification of compliance.
+- A promise to inventory an entire cloud account.
+- A one-command production migration with no review.
 - A public SaaS product by default.
-- A fully autonomous SOC or remediation tool.
+- A fully autonomous security or remediation system.
 - A tool for bypassing company policy.
 - A system that should ingest secrets, credentials, or private keys.
-- A deployment process that skips review for convenience.
-
+- A deployment process that hides risk to make migration look easier.

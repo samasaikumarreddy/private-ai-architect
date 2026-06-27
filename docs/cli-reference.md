@@ -38,6 +38,11 @@ private-ai audit
 
 Those commands return a non-zero exit code in v0.1 because production-impacting behavior should not exist until validation and runtime code are ready.
 
+The longer-term guided lifecycle also includes provider-specific discovery,
+blueprint generation, verification, evidence export, shadowing, cutover, and
+rollback. Command names for those stages are not stable and must not be treated
+as implemented.
+
 ## Generate A Dry-Run Plan
 
 ```bash
@@ -138,6 +143,10 @@ private-ai init --dry-run --interactive
 ```
 
 The interactive path prompts for mode, project name, company/workspace name, departments, and approved data sources. It still performs dry-run generation only.
+
+This is not yet the planned branching question graph. Future versions will
+select local RAG, private hardware, or cloud migration intent before asking
+target-specific questions.
 
 ## Deployment Modes
 
