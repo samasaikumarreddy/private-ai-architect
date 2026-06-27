@@ -87,10 +87,20 @@ present:
 ollama list
 ```
 
+For example, this explicit operator command installs the small model used by
+the maintainers for the Windows smoke test:
+
+```bash
+ollama pull llama3.2:1b
+```
+
+This download is performed by Ollama only when you run the command. The
+`private-ai` application never downloads a model.
+
 Then pass that exact local model name:
 
 ```bash
-private-ai chat "What are the AI usage rules?" --index generated/index/index.json --model <installed-model>
+private-ai chat "What are the AI usage rules?" --index generated/index/index.json --model llama3.2:1b
 ```
 
 The command:
@@ -98,7 +108,8 @@ The command:
 1. Searches the approved local index.
 2. Refuses before model invocation when no meaningful evidence matches.
 3. Checks `/api/tags` to verify the model is already installed.
-4. Sends only the retrieved chunks to the local Ollama chat API.
+4. Sends only query-matching sections from the retrieved chunks to the local
+   Ollama chat API.
 5. Prints the generated answer and citations from retrieval.
 
 `private-ai` never calls Ollama's model-pull endpoint. If Ollama or the requested

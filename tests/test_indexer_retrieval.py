@@ -49,6 +49,21 @@ class IndexerRetrievalTests(unittest.TestCase):
             self.assertNotIn("private-key-material", payload)
             self.assertEqual(len(result.skipped_files), 3)
 
+    def test_search_ignores_stop_word_only_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            docs = root / "docs"
+            docs.mkdir()
+            (docs / "unrelated.md").write_text(
+                "The approved process is documented here.",
+                encoding="utf-8",
+            )
+            result = build_index([docs], output_dir=root / "index", collection="docs")
+
+            matches = search_index(result.index_path, "What minerals are present on the moon?")
+
+            self.assertEqual(matches, [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -97,7 +97,8 @@ class CliTests(unittest.TestCase):
             docs = root / "docs"
             docs.mkdir()
             (docs / "policy.md").write_text(
-                "Approved AI tools require documented authorization.",
+                "Approved AI tools require documented authorization. "
+                "If requested behavior is not present, the assistant must refuse.",
                 encoding="utf-8",
             )
             index_dir = root / "index"

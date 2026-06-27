@@ -47,16 +47,20 @@ Optional flags:
 ## Grounding Flow
 
 1. Load the existing local index.
-2. Score chunks using the existing lexical retrieval behavior.
-3. Remove common query stop words for the evidence decision.
+2. Score chunks using meaningful lexical query terms; common and
+   low-information words do not affect ranking.
+3. Remove common and low-information query words from the evidence decision.
+   Generic words such as `present`, `show`, and `tell` cannot establish support.
 4. Refuse without invoking Ollama when no meaningful query term matches.
 5. Query local Ollama `/api/tags`.
 6. Continue only if the requested model is already installed.
-7. Send a system instruction, the question, and numbered retrieved chunks to
-   `/api/chat` with streaming disabled.
-8. Instruct the model to use only supplied sources and return a fixed refusal
+7. For indexed Markdown, select query-matching sections from each retrieved
+   chunk so unrelated sections are not placed in the model context.
+8. Send a system instruction, the question, and those numbered source sections
+   to `/api/chat` with streaming disabled.
+9. Instruct the model to use only supplied sources and return a fixed refusal
    token if support is insufficient.
-9. Append source paths and chunk numbers from retrieval to the final output.
+10. Append source paths and chunk numbers from retrieval to the final output.
 
 The client never calls `/api/pull`.
 
@@ -119,6 +123,21 @@ The v0.2 tests cover:
 - Existing dry-run and validation behavior
 - Existing retrieval-only chat behavior
 
+## Verified Local Smoke Test
+
+On 2026-06-27, the v0.2 flow was exercised end to end on Windows with Ollama
+0.30.11 and the explicitly installed `llama3.2:1b` model:
+
+- The sample AI-policy question returned only claims present in the selected
+  AI source sections and included retrieval citations.
+- An unrelated moon-minerals question was refused before Ollama was invoked.
+- Ollama reported the model running locally on an NVIDIA RTX 3060 Laptop GPU.
+- The warm supported query completed in 1.67 seconds and the pre-model refusal
+  in 0.37 seconds on that machine. These observations are not benchmarks.
+
+The same flow does not require a GPU; CPU performance depends on the selected
+model and machine.
+
 ## Limitations
 
 - Lexical retrieval is not semantic retrieval.
@@ -137,3 +156,4 @@ The v0.2 tests cover:
 - [Ollama installed-model API](https://docs.ollama.com/api/tags)
 - [Ollama API errors](https://docs.ollama.com/api/errors)
 - [Ollama streaming behavior](https://docs.ollama.com/api/streaming)
+- [Ollama `llama3.2` model](https://ollama.com/library/llama3.2)

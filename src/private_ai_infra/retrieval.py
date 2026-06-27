@@ -26,6 +26,9 @@ STOP_WORDS = {
     "of",
     "on",
     "or",
+    "present",
+    "show",
+    "tell",
     "the",
     "to",
     "what",
@@ -40,7 +43,9 @@ STOP_WORDS = {
 
 def search_index(index_path: Path, query: str, *, top_k: int = 3) -> list[dict[str, object]]:
     payload = json.loads(index_path.read_text(encoding="utf-8"))
-    query_terms = set(_tokenize(query))
+    query_terms = set(_tokenize(query)) - STOP_WORDS
+    if not query_terms:
+        return []
     scored: list[dict[str, object]] = []
 
     for entry in payload.get("entries", []):

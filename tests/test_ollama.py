@@ -30,7 +30,11 @@ class OllamaClientTests(unittest.TestCase):
                 {
                     "source_path": "policy.md",
                     "chunk_index": 0,
-                    "text": "Approved AI tools may use only data allowed for that tool.",
+                    "text": (
+                        "# Policy ## Device Rules Report lost devices. "
+                        "## AI Usage Approved AI tools may use only data allowed for that tool."
+                    ),
+                    "matched_terms": ["ai", "usage"],
                 }
             ],
             model="test-model",
@@ -46,6 +50,10 @@ class OllamaClientTests(unittest.TestCase):
         prompt = calls[1][2]["messages"][1]["content"]
         self.assertIn("policy.md#chunk-0", prompt)
         self.assertIn("Approved AI tools", prompt)
+        self.assertNotIn("Report lost devices", prompt)
+        system_prompt = calls[1][2]["messages"][0]["content"]
+        self.assertIn("Do not infer", system_prompt)
+        self.assertIn("end every bullet", system_prompt)
 
     def test_missing_model_stops_before_chat_and_never_downloads(self):
         calls = []
