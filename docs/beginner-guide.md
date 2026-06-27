@@ -368,6 +368,18 @@ optional local model answers. It does not yet provide production
 authentication, RBAC, semantic retrieval, audit storage, or deployment
 automation. Do not use it as a production security boundary.
 
+### Where does the architect run?
+
+`private-ai architect` can run on a developer laptop, admin workstation,
+bastion host, CI runner, or the future target machine. It only creates a
+blueprint and review documents.
+
+The future model and index may run somewhere else, such as the same laptop, a
+company GPU server, DGX, approved cloud GPU, or Mac cluster. The blueprint
+records these locations separately from data residency. Ingestion must run
+where the data is approved to exist; running the planner on a laptop does not
+authorize copying company documents there.
+
 ### Do I need a DGX system?
 
 No. Start on a developer machine. DGX-class hardware is relevant when model

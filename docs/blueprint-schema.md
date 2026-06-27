@@ -49,6 +49,8 @@ Every blueprint has these `requirements` fields:
 
 | Field | Type | Unknown representation |
 | --- | --- | --- |
+| `architect_location` | string | `"unknown"` |
+| `runtime_location` | string | `"unknown"` |
 | `data_location` | string | `"unknown"` |
 | `allowed_document_sources` | string array | empty array |
 | `user_count` | integer or null | `null` |
@@ -61,12 +63,59 @@ Every blueprint has these `requirements` fields:
 | `audit_logging_needs` | string | `"unknown"` |
 | `data_owner_approval` | string | `"unknown"` or `"pending"` |
 
+`architect_location` records where the planning CLI runs:
+
+- `developer-workstation`
+- `admin-workstation`
+- `bastion-host`
+- `ci-runner`
+- `target-machine`
+- `unknown`
+
+`runtime_location` records where the future model, index, retrieval process,
+and related storage are intended to run:
+
+- `same-machine`
+- `local-gpu-workstation`
+- `company-gpu-server`
+- `dgx-spark`
+- `dgx-server`
+- `cloud-gpu`
+- `mac-cluster`
+- `hybrid`
+- `unknown`
+
+`data_location` is the approved data-residency statement for storage and
+processing. It is free text because real policies may identify a site,
+jurisdiction, company environment, or separately reviewed hybrid boundary.
+
 Allowed network values are `localhost`, `private-network`, `vpn-only`,
 `public`, and `unknown`. Data owner approval is `approved`, `pending`, or
 `unknown`.
 
 Use `"none"` for compliance only after an accountable reviewer has confirmed
 that no listed framework applies. `"unknown"` remains unresolved.
+
+## Control Machine, Runtime, And Data
+
+These locations are deliberately separate:
+
+```text
+developer or admin machine
+  -> runs private-ai architect
+  -> produces blueprint and review documents
+
+approved target machine
+  -> may run ingestion, index, model, and retrieval in a later milestone
+
+approved data residency
+  -> determines where ingestion, indexing, models, and storage may operate
+```
+
+Running the architect on a laptop does not authorize copying company documents
+to that laptop. Ingestion and indexing must run where the data owner permits
+the data to exist. v0.3 only records this plan; it does not connect to or
+install anything on the target.
 
 ## Journey Details
 
@@ -129,7 +178,9 @@ The validator flags:
 - missing or pending data owner approval
 - unknown model choice
 - unknown runtime choice
+- unknown architect CLI or target runtime location
 - private GPU or DGX inputs as planning-only
+- cloud GPU targets as planning-only and subject to explicit data approval
 - cloud migration inputs as planning-only and not discovered
 
 Invalid schema structure fails validation. Unresolved planning decisions remain

@@ -11,6 +11,25 @@ from . import __version__
 
 BLUEPRINT_SCHEMA_VERSION = "1.0"
 ARCHITECT_JOURNEYS = ("local-rag", "private-gpu", "cloud-migration")
+ARCHITECT_LOCATIONS = (
+    "developer-workstation",
+    "admin-workstation",
+    "bastion-host",
+    "ci-runner",
+    "target-machine",
+    "unknown",
+)
+RUNTIME_LOCATIONS = (
+    "same-machine",
+    "local-gpu-workstation",
+    "company-gpu-server",
+    "dgx-spark",
+    "dgx-server",
+    "cloud-gpu",
+    "mac-cluster",
+    "hybrid",
+    "unknown",
+)
 NETWORK_EXPOSURES = ("localhost", "private-network", "vpn-only", "public", "unknown")
 DATA_OWNER_APPROVALS = ("approved", "pending", "unknown")
 DEPLOYMENT_STAGES = ("pilot", "shared-internal", "production", "unknown")
@@ -20,6 +39,8 @@ ANSWER_FIELDS = frozenset(
         "journey",
         "project_name",
         "owner_name",
+        "architect_location",
+        "runtime_location",
         "data_location",
         "allowed_document_sources",
         "user_count",
@@ -70,6 +91,8 @@ REQUIRED_TOP_LEVEL_KEYS = frozenset(
 REQUIRED_REQUIREMENT_KEYS = frozenset(
     {
         "data_location",
+        "architect_location",
+        "runtime_location",
         "allowed_document_sources",
         "user_count",
         "model_preference",
@@ -104,6 +127,8 @@ class ArchitectAnswers:
     journey: str
     project_name: str
     owner_name: str
+    architect_location: str
+    runtime_location: str
     data_location: str
     allowed_document_sources: tuple[str, ...]
     user_count: int | None
@@ -202,6 +227,18 @@ def architect_answers_from_mapping(values: Mapping[str, Any]) -> ArchitectAnswer
     journey = normalize_journey(values.get("journey") or "")
     project_name = _normalize_text(values.get("project_name"), default="private-ai-plan")
     owner_name = _normalize_text(values.get("owner_name"), default="unknown")
+    architect_location = _normalize_choice(
+        values.get("architect_location"),
+        allowed=ARCHITECT_LOCATIONS,
+        default="unknown",
+        field="architect_location",
+    )
+    runtime_location = _normalize_choice(
+        values.get("runtime_location"),
+        allowed=RUNTIME_LOCATIONS,
+        default="unknown",
+        field="runtime_location",
+    )
     data_location = _normalize_text(values.get("data_location"), default="unknown")
     allowed_document_sources = _normalize_list(values.get("allowed_document_sources"))
     user_count = _normalize_user_count(values.get("user_count"))
@@ -256,6 +293,8 @@ def architect_answers_from_mapping(values: Mapping[str, Any]) -> ArchitectAnswer
         journey=journey,
         project_name=project_name,
         owner_name=owner_name,
+        architect_location=architect_location,
+        runtime_location=runtime_location,
         data_location=data_location,
         allowed_document_sources=allowed_document_sources,
         user_count=user_count,
@@ -277,6 +316,8 @@ def architect_answers_from_mapping(values: Mapping[str, Any]) -> ArchitectAnswer
 
 def build_blueprint(answers: ArchitectAnswers) -> dict[str, Any]:
     requirements = {
+        "architect_location": answers.architect_location,
+        "runtime_location": answers.runtime_location,
         "data_location": answers.data_location,
         "allowed_document_sources": list(answers.allowed_document_sources),
         "user_count": answers.user_count,
@@ -450,17 +491,26 @@ def validate_blueprint(
     if isinstance(requirements, dict):
         _validate_requirements(requirements, errors, warnings)
 
+    runtime_location = ""
+    if isinstance(requirements, dict):
+        runtime_location = str(requirements.get("runtime_location", ""))
+
     if journey == "private-gpu":
         target = ""
         details = blueprint.get("journey_details")
         if isinstance(details, dict):
             target = str(details.get("target_hardware", ""))
-        if "dgx" in target.lower():
+        if "dgx" in target.lower() or runtime_location in {"dgx-spark", "dgx-server"}:
             warnings.append("DGX is recorded as planning-only; no DGX configuration was generated.")
         else:
             warnings.append("Private GPU hardware is planning-only; compatibility is not verified.")
     elif journey == "cloud-migration":
         warnings.append("Cloud migration is planning-only; no provider API or discovery was called.")
+
+    if journey != "private-gpu" and runtime_location in {"dgx-spark", "dgx-server"}:
+        warnings.append("DGX is recorded as planning-only; no DGX configuration was generated.")
+    if runtime_location == "cloud-gpu":
+        warnings.append("Cloud GPU is a planning target only; no provider API or deployment was called.")
 
     return BlueprintValidationResult(
         path=path,
@@ -473,6 +523,14 @@ def _unresolved_decisions(answers: ArchitectAnswers) -> tuple[str, ...]:
     decisions: list[str] = []
     checks = (
         (answers.owner_name == "unknown", "Name the company or accountable owner."),
+        (
+            answers.architect_location == "unknown",
+            "Record where the Private AI Architect CLI will run.",
+        ),
+        (
+            answers.runtime_location == "unknown",
+            "Decide where the future model, index, and retrieval runtime will run.",
+        ),
         (answers.data_location == "unknown", "Decide where approved data may be stored and processed."),
         (not answers.allowed_document_sources, "Approve the document sources that may be used."),
         (answers.user_count is None, "Estimate the number of users."),
@@ -514,6 +572,16 @@ def _unresolved_decisions(answers: ArchitectAnswers) -> tuple[str, ...]:
 
 def _known_risks(answers: ArchitectAnswers) -> tuple[str, ...]:
     risks: list[str] = []
+    if answers.architect_location == "unknown":
+        risks.append("The planning CLI execution boundary is unknown.")
+    if answers.runtime_location == "unknown":
+        risks.append("Runtime placement is unknown, so compute and data-path controls cannot be reviewed.")
+    if answers.data_location == "unknown":
+        risks.append("Data residency is unknown, so ingestion and indexing placement cannot be approved.")
+    if answers.runtime_location == "cloud-gpu":
+        risks.append("A cloud GPU target requires explicit approval for data storage, processing, and transit.")
+    if answers.runtime_location in {"dgx-spark", "dgx-server"}:
+        risks.append("DGX is an unverified planning target; no configuration or compatibility check ran.")
     if answers.network_exposure == "public":
         risks.append("Public exposure can reveal private AI services and requires formal network review.")
     if answers.data_owner_approval != "approved":
@@ -546,6 +614,8 @@ def _validate_requirements(
     _validate_non_empty_strings(
         requirements,
         (
+            "architect_location",
+            "runtime_location",
             "data_location",
             "model_preference",
             "runtime_preference",
@@ -563,6 +633,16 @@ def _validate_requirements(
         errors.append("requirements.user_count must be null or a positive integer")
     if requirements.get("network_exposure") not in NETWORK_EXPOSURES:
         errors.append(f"requirements.network_exposure must be one of: {', '.join(NETWORK_EXPOSURES)}")
+    if requirements.get("architect_location") not in ARCHITECT_LOCATIONS:
+        errors.append(
+            "requirements.architect_location must be one of: "
+            f"{', '.join(ARCHITECT_LOCATIONS)}"
+        )
+    if requirements.get("runtime_location") not in RUNTIME_LOCATIONS:
+        errors.append(
+            "requirements.runtime_location must be one of: "
+            f"{', '.join(RUNTIME_LOCATIONS)}"
+        )
     if requirements.get("data_owner_approval") not in DATA_OWNER_APPROVALS:
         errors.append(
             "requirements.data_owner_approval must be one of: "
@@ -577,6 +657,10 @@ def _validate_requirements(
         warnings.append("Model preference is unresolved.")
     if requirements.get("runtime_preference") == "unknown":
         warnings.append("Runtime preference is unresolved.")
+    if requirements.get("architect_location") == "unknown":
+        warnings.append("Architect CLI execution location is unresolved.")
+    if requirements.get("runtime_location") == "unknown":
+        warnings.append("Target runtime location is unresolved.")
 
 
 def _validate_object_keys(

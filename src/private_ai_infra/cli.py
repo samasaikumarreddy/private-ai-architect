@@ -7,10 +7,12 @@ from pathlib import Path
 from . import __version__
 from .architect import generate_architect_pack
 from .blueprint import (
+    ARCHITECT_LOCATIONS,
     ARCHITECT_JOURNEYS,
     DATA_OWNER_APPROVALS,
     DEPLOYMENT_STAGES,
     NETWORK_EXPOSURES,
+    RUNTIME_LOCATIONS,
     architect_answers_from_mapping,
     load_answers_file,
     load_blueprint,
@@ -184,7 +186,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     architect_parser.add_argument("--project-name", help="Project name.")
     architect_parser.add_argument("--owner-name", help="Company or accountable owner name.")
-    architect_parser.add_argument("--data-location", help="Allowed data storage and processing location.")
+    architect_parser.add_argument(
+        "--architect-location",
+        choices=ARCHITECT_LOCATIONS,
+        help="Machine or control environment where this planning CLI runs.",
+    )
+    architect_parser.add_argument(
+        "--runtime-location",
+        choices=RUNTIME_LOCATIONS,
+        help="Planned location for the future model, index, and retrieval runtime.",
+    )
+    architect_parser.add_argument(
+        "--data-location",
+        help="Approved data residency for storage and processing.",
+    )
     architect_parser.add_argument(
         "--document-source",
         action="append",
@@ -396,6 +411,8 @@ def handle_architect(args: argparse.Namespace) -> int:
         "journey",
         "project_name",
         "owner_name",
+        "architect_location",
+        "runtime_location",
         "data_location",
         "allowed_document_sources",
         "user_count",
@@ -509,12 +526,24 @@ def _prompt_for_architect_answers(initial: dict[str, object]):
         {"journey": journey}
     ).journey
     network_default = "localhost" if normalized_journey == "local-rag" else "private-network"
+    runtime_default = "same-machine" if normalized_journey == "local-rag" else "unknown"
 
     values: dict[str, object] = {
         "journey": normalized_journey,
         "project_name": _ask("Project name", str(initial.get("project_name") or "private-ai-plan")),
         "owner_name": _ask("Company or accountable owner", str(initial.get("owner_name") or "unknown")),
-        "data_location": _ask("Data storage and processing location", str(initial.get("data_location") or "unknown")),
+        "architect_location": _ask(
+            f"Architect CLI location ({', '.join(ARCHITECT_LOCATIONS)})",
+            str(initial.get("architect_location") or "developer-workstation"),
+        ),
+        "runtime_location": _ask(
+            f"Target runtime location ({', '.join(RUNTIME_LOCATIONS)})",
+            str(initial.get("runtime_location") or runtime_default),
+        ),
+        "data_location": _ask(
+            "Data residency for storage and processing",
+            str(initial.get("data_location") or "unknown"),
+        ),
         "allowed_document_sources": _split_csv(
             _ask(
                 "Approved document source labels or paths (not read)",

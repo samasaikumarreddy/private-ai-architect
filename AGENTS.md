@@ -9,6 +9,7 @@ The active implementation milestone is v0.3 guided architect planning:
 - Branch first on local RAG, private GPU, or cloud migration intent
 - Ask only journey-relevant questions
 - Generate a normalized, checksummed JSON blueprint
+- Keep architect CLI, target runtime, and data-residency locations separate
 - Record unknown decisions and known risks explicitly
 - Generate deterministic review documents
 - Validate planning safety without applying infrastructure

@@ -24,6 +24,8 @@ def complete_answers(journey: str = "local-rag") -> dict[str, object]:
         "journey": journey,
         "project_name": "demo",
         "owner_name": "example owner",
+        "architect_location": "developer-workstation",
+        "runtime_location": "same-machine" if journey == "local-rag" else "company-gpu-server",
         "data_location": "on premises",
         "allowed_document_sources": ["./approved-docs"],
         "user_count": 10,
@@ -99,6 +101,23 @@ class GuidedArchitectTests(unittest.TestCase):
             {"target_hardware", "deployment_stage"},
         )
         self.assertTrue(any("DGX" in warning for warning in result.warnings))
+
+    def test_architect_runtime_and_data_locations_stay_separate(self):
+        values = complete_answers()
+        values["architect_location"] = "developer-workstation"
+        values["runtime_location"] = "cloud-gpu"
+        values["data_location"] = "company-controlled cloud storage after approval"
+        blueprint = build_blueprint(architect_answers_from_mapping(values))
+        requirements = blueprint["requirements"]
+        risks = "\n".join(blueprint["known_risks"])
+
+        self.assertEqual(requirements["architect_location"], "developer-workstation")
+        self.assertEqual(requirements["runtime_location"], "cloud-gpu")
+        self.assertEqual(
+            requirements["data_location"],
+            "company-controlled cloud storage after approval",
+        )
+        self.assertIn("cloud GPU target requires explicit approval", risks)
 
     def test_cloud_migration_does_not_call_cloud_or_system_apis(self):
         with tempfile.TemporaryDirectory() as tmp:

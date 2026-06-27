@@ -116,6 +116,7 @@ Current implementation:
   cloud migration planning
 - Stable schema `1.0` JSON blueprint with checksum, unknowns, risks, and
   explicit out-of-scope items
+- Separate architect CLI, target runtime, and data-residency locations
 - `private-ai blueprint validate`
 - Deterministic `summary.md`, `decisions-needed.md`, `security-risks.md`, and
   `next-steps.md`
@@ -141,7 +142,7 @@ Current implementation:
 - Verified `llama3.2:1b` smoke test on an RTX 3060 Laptop GPU
 - Optional interactive dry-run prompts
 - Safety stubs for not-yet-implemented commands
-- 50 unit tests; GitHub CI runs on Python 3.11 and 3.12
+- 51 unit tests; GitHub CI runs on Python 3.11 and 3.12
 
 Not implemented yet:
 
@@ -156,6 +157,11 @@ Not implemented yet:
 The private GPU and cloud migration journeys collect user-provided planning
 requirements only. They do not configure DGX systems, call provider APIs, or
 perform migration work.
+
+The architect CLI may run on a developer laptop, admin workstation, bastion,
+CI runner, or the eventual target. The blueprint separately records where the
+future model/index runtime should live and where data is approved to exist.
+Running the planner on one machine never authorizes copying private data there.
 
 ## Quickstart
 

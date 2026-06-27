@@ -253,6 +253,8 @@ private-ai architect --answers-file examples/architect/cloud-migration-answers.j
 Expected results:
 
 - Each command writes `blueprint.json` and five Markdown review files.
+- Each blueprint separates architect CLI location, target runtime location,
+  and data residency.
 - Local RAG output has no cloud migration detail fields.
 - Private GPU output warns that DGX or GPU choices are planning-only.
 - Cloud migration output says no provider discovery was performed.

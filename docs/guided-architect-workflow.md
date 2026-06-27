@@ -27,6 +27,33 @@ The questionnaire is a decision graph, not one long form. Answers determine
 which questions become relevant. Unknown answers remain unresolved and may
 become validation blockers.
 
+## Where The Command Runs
+
+The planning command and the future AI runtime are separate:
+
+```mermaid
+flowchart LR
+    CONTROL["Developer laptop, admin workstation, bastion, or CI runner"]
+    CONTROL -->|"private-ai architect"| PACK["Blueprint and review documents"]
+    PACK --> TARGET["Planned runtime location"]
+    TARGET --> LOCAL["Same machine or local GPU"]
+    TARGET --> SERVER["Company GPU or DGX"]
+    TARGET --> CLOUD["Approved cloud GPU"]
+    TARGET --> MAC["Mac node or cluster"]
+```
+
+v0.3 runs only on the control machine and stops after writing the review pack.
+It does not contact any target. The blueprint separately records:
+
+- `architect_location`: where the CLI is executed
+- `runtime_location`: where the future model, index, and retrieval service are
+  intended to run
+- `data_location`: where data is approved for storage and processing
+
+The governing rule is that ingestion and indexing must run where the data is
+allowed to exist. A blueprint created on a developer laptop does not permit
+company data to be copied there.
+
 ## Current v0.3 Command
 
 Run the beginner-friendly interactive questionnaire:

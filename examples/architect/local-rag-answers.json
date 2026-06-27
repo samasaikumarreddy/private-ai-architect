@@ -2,6 +2,7 @@
   "allowed_document_sources": [
     "./examples/sample-company-docs"
   ],
+  "architect_location": "developer-workstation",
   "audit_logging_needs": "local command history and reviewed evaluation results",
   "authentication_rbac_needs": "single approved local developer",
   "compliance_concerns": [
@@ -16,5 +17,6 @@
   "owner_name": "local",
   "project_name": "local-rag-plan",
   "runtime_preference": "ollama",
+  "runtime_location": "same-machine",
   "user_count": 1
 }

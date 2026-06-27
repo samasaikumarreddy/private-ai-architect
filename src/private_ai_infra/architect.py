@@ -107,7 +107,9 @@ def _summary(blueprint: dict[str, Any]) -> str:
 
 | Requirement | Recorded answer |
 | --- | --- |
-| Data location | {_inline(requirements["data_location"])} |
+| Architect CLI location | {_inline(requirements["architect_location"])} |
+| Target runtime location | {_inline(requirements["runtime_location"])} |
+| Data residency | {_inline(requirements["data_location"])} |
 | User count | {_inline(requirements["user_count"])} |
 | Model preference | {_inline(requirements["model_preference"])} |
 | Runtime preference | {_inline(requirements["runtime_preference"])} |
@@ -132,6 +134,12 @@ def _summary(blueprint: dict[str, Any]) -> str:
 - Cloud discovery: none
 - Data ingestion: none
 - Secrets collected: none
+
+## Placement Rule
+
+Ingestion, indexing, models, and vector storage must run only where the data is
+approved to exist. Running the architect CLI on a developer or admin machine
+does not authorize copying company data to that machine.
 """
 
 
@@ -177,6 +185,7 @@ def _next_steps(blueprint: dict[str, Any]) -> str:
     common = [
         "Resolve every item in `decisions-needed.md`.",
         "Confirm data owner approval for each named document source.",
+        "Confirm that runtime and ingestion placement follows the recorded data residency.",
         "Review public or remote exposure with security and network owners.",
         "Regenerate the pack and validate the new `blueprint.json` checksum.",
     ]

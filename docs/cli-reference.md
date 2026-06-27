@@ -68,6 +68,8 @@ private-ai architect \
   --journey local-rag \
   --project-name private-ai-demo \
   --owner-name local \
+  --architect-location developer-workstation \
+  --runtime-location same-machine \
   --data-location local-workstation \
   --document-source ./examples/sample-company-docs \
   --user-count 1 \
@@ -96,6 +98,17 @@ private-ai architect `
 `--answers-file` is non-interactive. Matching command-line flags override file
 values. Source names are recorded as planning labels but are not opened or
 ingested.
+
+Placement options:
+
+```text
+--architect-location developer-workstation|admin-workstation|bastion-host|ci-runner|target-machine|unknown
+--runtime-location same-machine|local-gpu-workstation|company-gpu-server|dgx-spark|dgx-server|cloud-gpu|mac-cluster|hybrid|unknown
+```
+
+`--data-location` separately records the approved data residency. Ingestion
+and indexing must eventually run where that data is allowed to exist; the
+architect command itself does not contact the target or read the source.
 
 Generated files:
 

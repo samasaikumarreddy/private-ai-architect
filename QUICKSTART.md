@@ -85,6 +85,12 @@ generated/architect/
 
 The answers file names an approved source but the architect command does not
 open or ingest that source. It only normalizes the provided planning answers.
+The blueprint separately records the machine running the architect CLI, the
+planned model/index runtime location, and the approved data residency.
+
+For example, an admin laptop can generate a plan for a company GPU server
+without contacting that server. Any later ingestion must run where the data is
+approved to exist.
 
 For interactive use:
 

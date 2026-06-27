@@ -102,6 +102,7 @@ Delivered:
 - Explicit unresolved decisions
 - Artifact provenance and blueprint checksums
 - Owner and data approval fields
+- Separate architect CLI, target runtime, and data-residency locations
 - Deterministic review documents
 - Blueprint schema and safety validation
 - Interactive prompts, flags, and JSON answers files
